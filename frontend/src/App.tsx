@@ -1,15 +1,17 @@
-import { BrowserRouter } from "react-router-dom";
-import { AppRoutes } from "./routes";
-import { ThemeProvider } from "@emotion/react";
-import { LightTheme } from "./shared/themes";
+import { BrowserRouter } from 'react-router-dom';
+import { AppRoutes } from './routes';
+import { ThemeProvider } from '@mui/material/styles';
+import { LightTheme } from './shared/themes';
+import { DefaultHeader } from './shared/components/DefaultHeader';
 
 export const App = () => {
-  return (
-    <ThemeProvider theme={LightTheme}>
-      <BrowserRouter>
-        <AppRoutes/>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
+    return(
+      <ThemeProvider theme={LightTheme}>
+        <BrowserRouter>
+          <DefaultHeader />
+          <AppRoutes/>
+        </BrowserRouter>
+      </ThemeProvider>
+   );
 }
 

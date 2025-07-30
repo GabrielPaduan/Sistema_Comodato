@@ -12,5 +12,9 @@ export const LightTheme = createTheme({
       default: '#dfe0ea',
       paper: '#ffffff',
     },
+    text: {
+      primary: '#000000',
+      secondary: '#ffffff',
+    },
   },
 });
