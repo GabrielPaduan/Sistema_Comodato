@@ -8,9 +8,8 @@ export const App = () => {
     return(
       <ThemeProvider theme={LightTheme}>
         <BrowserRouter>
-          <DefaultHeader>
+          <DefaultHeader />
             <AppRoutes/>
-          </DefaultHeader>
         </BrowserRouter>
       </ThemeProvider>
    );
