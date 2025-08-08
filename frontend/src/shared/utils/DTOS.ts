@@ -19,10 +19,17 @@ export interface ClientDTOInsert {
 
 export interface ProductDTO {
     ID_Prod: number;
-    Prod_Nome: string;
     Prod_Valor: number;
-    Prod_Qtde: number;
+    Prod_CustoCompra: number;
+    Prod_CFOP: string;
+    Prod_NCM: number;
+    Prod_UnMedida: string;
+    Prod_CodProduto: string;
+    Prod_CodBarras: string;
     Prod_ValorTotal: number;
+    Prod_Nome: string;
+    Prod_Estoque: number;
+    Prod_Qtde: number;
 }
 
 export interface ContractDTO {

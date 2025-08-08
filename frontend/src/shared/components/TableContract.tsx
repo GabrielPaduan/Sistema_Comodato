@@ -6,9 +6,10 @@ import React from "react";
 interface CustomTableContractProps extends TableContractProps {
     onAddProduct: (productId: number, cmdt: number) => void;
     onRemoveProduct: (productId: number) => void;
+    onRemoveContract: (contractId: number) => void;
 }
 
-export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct }) => {
+export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct, onRemoveContract }) => {
     return (
         <TableContainer component={"table"} sx={{ width: "50%", margin: "auto", paddingTop: 10, cursor: "default" }}>
             <Table>
@@ -16,8 +17,10 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                     <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>CMDT</TableCell>
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>PRODUTOS</TableCell>
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>VALOR</TableCell>
-                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>QTDE</TableCell>
+                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>REPOSIÇÃO</TableCell>
+                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>ESTOQUE</TableCell>
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>VALOR TOTAL</TableCell>
+                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>REMOVER</TableCell>
                 </TableHead>
                 <TableBody>
                     {contracts.map((contract) => {
@@ -31,14 +34,16 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                                 <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_Valor.toFixed(2)}</TableCell>
                                 <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
                                     <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
-                                        {/* Chama a função do PAI */}
                                         <Button onClick={() => onRemoveProduct(product.ID_Prod)}><Icon sx={{ fontSize: 30 }}>remove_circle</Icon></Button>
-                                        <Typography sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Qtde}</Typography>
-                                        {/* Chama a função do PAI */}
+                                            <Typography sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Qtde}</Typography>
                                         <Button onClick={() => onAddProduct(product.ID_Prod, contract.Cont_Comodato)}><Icon sx={{ fontSize: 30 }}>add_circle</Icon></Button>
                                     </Box>
                                 </TableCell>
+                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Estoque}</TableCell>
                                 <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_ValorTotal.toFixed(2)}</TableCell>
+                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
+                                    <Button onClick={() => onRemoveContract(contract.ID_Contrato)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
+                                </TableCell>
                             </TableRow>
                         );
                     })}

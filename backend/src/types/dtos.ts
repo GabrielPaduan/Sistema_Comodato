@@ -5,7 +5,7 @@ export interface ClientDTO {
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
-    cli_cep: string;
+    cli_cep: string;   
 }
 
 export interface ClientDTOInsert {
@@ -14,15 +14,22 @@ export interface ClientDTOInsert {
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
-    cli_cep: string;      
+    cli_cep: string;       
 }
 
 export interface ProductDTO {
     ID_Prod: number;
-    Prod_Nome: string;
     Prod_Valor: number;
-    Prod_Qtde: number;
+    Prod_CustoCompra: number;
+    Prod_CFOP: string;
+    Prod_NCM: number;
+    Prod_UnMedida: string;
+    Prod_CodProduto: string;
+    Prod_CodBarras: string;
     Prod_ValorTotal: number;
+    Prod_Nome: string;
+    Prod_Estoque: number;
+    Prod_Qtde: number;
 }
 
 export interface ContractDTO {
