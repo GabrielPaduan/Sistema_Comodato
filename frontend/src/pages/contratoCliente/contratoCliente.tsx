@@ -1,16 +1,14 @@
-import { Box, Button, Tab, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import React from "react";
+import { useParams } from "react-router-dom"; // Importe o hook
 import { LayoutBaseContrato } from "../../shared/components";
-import { generateReport } from "../../shared/utils/Report";
-import { Link } from "react-router-dom";
 
-export class ContratoCliente extends React.Component {
-  render() {
+export const ContratoCliente: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+
     return (
-      <Box textAlign={"center"}>
-        <LayoutBaseContrato />
-      </Box>
-
+        <Box textAlign={"center"}>
+            <LayoutBaseContrato id={Number(id || 0)} />
+        </Box>
     );
-  }
-}
+};

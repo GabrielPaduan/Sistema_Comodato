@@ -1,15 +1,20 @@
 export interface ClientDTO {
     id: number;
     cli_razaoSocial: string;
-    cli_nomeFantasia: string;
-    cli_responsavel: string;
     cli_email: string;
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
     cli_cep: string;
-    cli_telCelular: string | null; 
-    cli_telFixo?: string;        
+}
+
+export interface ClientDTOInsert {
+    cli_razaoSocial: string;
+    cli_email: string;
+    cli_doc: string;
+    cli_typeDoc: number;
+    cli_end: string;
+    cli_cep: string;      
 }
 
 export interface ProductDTO {

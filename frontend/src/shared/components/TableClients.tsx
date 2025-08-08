@@ -12,7 +12,6 @@ export const TableClients: React.FC = () => {
             const data = await getAllClients();
             setClientsData(data);
         } catch (err: any) {
-            setError('Não foi possível carregar os dados dos clientes.');
             console.error(err);
         } 
         };
@@ -48,8 +47,8 @@ export const TableClients: React.FC = () => {
                                     onClick={() => window.location.href = `/contrato-cliente/${client.id}`}
                                 >
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{client.cli_razaoSocial}</TableCell>
-                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{client.cli_responsavel}</TableCell>
-                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{client.cli_telCelular !== "" ? client.cli_telCelular : client.cli_telFixo}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{client.cli_email}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{client.cli_end}</TableCell>
                                 </TableRow>
                             ))
                         )

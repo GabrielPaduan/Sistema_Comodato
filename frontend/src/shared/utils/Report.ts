@@ -14,45 +14,31 @@ export const generateReport = (client: ClientDTO, contracts: ContractDTO[], prod
     doc.rect(margin, y, 190, 40, 'D'); // x, y, width, height
 
     // Coluna da Esquerda do Cabeçalho
-    y += 8;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text("Responsável:", margin + 5, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(client.cli_responsavel, margin + 28, y);
 
-    y += 7;
+    y += 18;
     doc.setFont('helvetica', 'bold');
-    doc.text(`${client.cli_typeDoc == 1 ? 'CPF' : 'CNPJ'}:`, margin + 5, y);
+    doc.text(`${client.cli_typeDoc == 0 ? 'CPF' : 'CNPJ'}:`, margin + 5, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(client.cli_doc, margin + 15, y);
+    doc.text(client.cli_doc, margin + 20, y);
 
     y += 7;
     doc.setFont('helvetica', 'bold');
     doc.text("Endereço:", margin + 5, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(client.cli_end, margin + 22, y);
+    doc.text(client.cli_end, margin + 35, y);
 
     // Coluna da Direita do Cabeçalho
-    y = margin + 8; // Reset Y para alinhar
-    doc.setFontSize(10);
+    y = margin + 18; // Reset Y para alinhar
     doc.setFont('helvetica', 'bold');
     doc.text("Razão Social:", 120, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(client.cli_razaoSocial, 145, y);
+    doc.text(client.cli_razaoSocial, 160, y);
 
-    y += 7;
+     // Reset Y para alinhar
     doc.setFont('helvetica', 'bold');
-    doc.text("Nome Fantasia:", 120, y);
+    doc.text("Email:", 120, y + 7);
     doc.setFont('helvetica', 'normal');
-    doc.text(client.cli_nomeFantasia, 148, y);
-
-    y += 7;
-    doc.setFont('helvetica', 'bold');
-    doc.text("Telefone:", 120, y);
-    doc.setFont('helvetica', 'normal');
-    const telefone = client.cli_telCelular || client.cli_telFixo || 'N/A';
-    doc.text(telefone, 138, y);
+    doc.text(client.cli_email, 140, y + 7);
 
     // Pula para depois do cabeçalho
     y = 50 + margin + 10; 
@@ -118,5 +104,5 @@ export const generateReport = (client: ClientDTO, contracts: ContractDTO[], prod
     doc.text("Orcose | PR | reidooleodistribuidora@gmail.com", 70, y + 20);
 
     // --- SALVAR O ARQUIVO ---
-    doc.save(`relatorio-${client.cli_nomeFantasia.replace(/\s+/g, '-')}.pdf`);
+    doc.save(`relatorio-${client.cli_razaoSocial.replace(/\s+/g, '-')}.pdf`);
 }
