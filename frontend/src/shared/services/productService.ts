@@ -2,7 +2,7 @@ import api from '../services/api'; // Importa nossa instância centralizada do a
 import { ProductDTO } from '../utils/DTOS'; // Supondo que você também tenha um arquivo de tipos no frontend
 
 // Função para buscar TODOS os produtos
-export const getAllProdutos = async (): Promise<ProductDTO[]> => {
+export const getAllProducts = async (): Promise<ProductDTO[]> => {
   const response = await api.get('/produtos');
   return response.data; // O axios já converte a resposta para JSON
 };

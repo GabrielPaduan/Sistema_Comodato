@@ -5,8 +5,7 @@ import { TableContract } from "./TableContract";
 import { generateReport } from "../utils/Report";
 import { getClientById } from "../services/clientService"; // Supondo que você tenha este serviço
 import { GenericButton } from "./GenericButton";
-import { FormField } from "./FormField";
-import { Margin } from "@mui/icons-material";
+import { getAllProducts } from "../services/productService";
 
 const style = {
   position: 'absolute',
@@ -39,33 +38,14 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     const clientData = await getClientById(id);
                     setClient(clientData);
                     console.log(clientData)
+                    const productData = await getAllProducts();
+                    setProducts(productData);
+                    console.log(productData)
                     // AQUI VOCÊ DEVERIA BUSCAR OS CONTRATOS E PRODUTOS REAIS DO CLIENTE
                     // Por enquanto, usaremos os dados mockados
                     setContracts([
-                        { ID_Contrato: 1, Cont_ID_Cli: id, Cont_ID_Prod: 1, Cont_Comodato: 5 },
-                        { ID_Contrato: 2, Cont_ID_Cli: id, Cont_ID_Prod: 2, Cont_Comodato: 3 }
-                    ]);
-                    setProducts([
-                        {
-                            ID_Prod: 1, Prod_Nome: "Produto A", Prod_Valor: 10, Prod_Qtde: 0, Prod_ValorTotal: 0,
-                            Prod_CustoCompra: 0,
-                            Prod_CFOP: "",
-                            Prod_NCM: 0,
-                            Prod_UnMedida: "",
-                            Prod_CodProduto: "",
-                            Prod_CodBarras: "",
-                            Prod_Estoque: 0
-                        },
-                        {
-                            ID_Prod: 2, Prod_Nome: "Produto B", Prod_Valor: 20, Prod_Qtde: 0, Prod_ValorTotal: 0,
-                            Prod_CustoCompra: 0,
-                            Prod_CFOP: "",
-                            Prod_NCM: 0,
-                            Prod_UnMedida: "",
-                            Prod_CodProduto: "",
-                            Prod_CodBarras: "",
-                            Prod_Estoque: 0
-                        }
+                        { ID_Contrato: 1, Cont_ID_Cli: id, Cont_ID_Prod: 3, Cont_Comodato: 5 },
+                        { ID_Contrato: 2, Cont_ID_Cli: id, Cont_ID_Prod: 4, Cont_Comodato: 3 }
                     ]);
                 } catch (err) {
                     console.error("Erro ao buscar dados:", err);
@@ -105,7 +85,6 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         setContracts(currentContracts => currentContracts.filter(c => c.ID_Contrato !== contractId));
     };
 
-
     return (
         <Box padding={10}>
             <Modal
@@ -116,7 +95,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" variant="h6" component="h2" textAlign={"center"}>
-                    Adicionar Novo Produto
+                        Adicionar Novo Produto
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }} />
 
@@ -124,17 +103,6 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                         color: '#000000ff',
                         opacity: 1,
                     }, }}/>
-
-                    <TextField variant="filled" label="Valor" name="valorProduto" required placeholder="Digite o valor do produto" fullWidth sx={{ marginBottom: 2, '& .MuiInputBase-input::placeholder': {
-                        color: '#000000ff',
-                        opacity: 1, 
-                     }, }}/>
-
-                    <TextField variant="filled" label="Quantidade" name="quantidadeProduto" required placeholder="Digite a quantidade do produto" fullWidth sx={{ marginBottom: 2, '& .MuiInputBase-input::placeholder': {
-                        color: '#000000ff',
-                        opacity: 1,
-                    }, }}/>
-
                     <Button>
                         <Typography>Adicionar</Typography>
                     </Button>   
