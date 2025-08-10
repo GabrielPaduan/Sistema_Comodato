@@ -1,11 +1,13 @@
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import { ClientDTO, ContractDTO, LayoutBaseContratoProps, ProductDTO } from "../utils/DTOS";
+import { ClientDTO, ContractDTO, ContractDTOInsert, LayoutBaseContratoProps, ProductDTO } from "../utils/DTOS";
 import React, { useEffect, useState } from "react";
 import { TableContract } from "./TableContract";
 import { generateReport } from "../utils/Report";
 import { getClientById } from "../services/clientService"; // Supondo que você tenha este serviço
 import { GenericButton } from "./GenericButton";
-import { getAllProducts } from "../services/productService";
+import { getAllProducts, getProductByContractId, getProductById } from "../services/productService";
+import { SearchField } from "./searchField";
+import { createContract, getContractByClientId } from "../services/contractService";
 
 const style = {
   position: 'absolute',
@@ -22,8 +24,11 @@ const style = {
 export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) => {
     const [client, setClient] = useState<ClientDTO | null>(null);
     const [contracts, setContracts] = useState<ContractDTO[]>([]);
+    const [contractsInsert, setContractsInsert] = useState<ContractDTOInsert>();
     const [products, setProducts] = useState<ProductDTO[]>([]);
     const [open, setOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -43,10 +48,8 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     console.log(productData)
                     // AQUI VOCÊ DEVERIA BUSCAR OS CONTRATOS E PRODUTOS REAIS DO CLIENTE
                     // Por enquanto, usaremos os dados mockados
-                    setContracts([
-                        { ID_Contrato: 1, Cont_ID_Cli: id, Cont_ID_Prod: 3, Cont_Comodato: 5 },
-                        { ID_Contrato: 2, Cont_ID_Cli: id, Cont_ID_Prod: 4, Cont_Comodato: 3 }
-                    ]);
+                    const contractData = await getContractByClientId(id);
+                    setContracts(Array.isArray(contractData) ? contractData : [contractData]);
                 } catch (err) {
                     console.error("Erro ao buscar dados:", err);
                 }
@@ -54,6 +57,23 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         };
         fetchData();
     }, [id]); // Executa sempre que o ID mudar
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const contractData = await getContractByClientId(id);
+            setContracts(Array.isArray(contractData) ? contractData : [contractData]);
+            for (const contract of contracts) {
+                const productData = await getProductByContractId(contract.ID_Contrato);
+                setProducts(Array.isArray(productData) ? productData : [productData]);
+                console.log("Products for contract:", productData);
+            }
+        };
+        fetchData();
+    }, [contractsInsert]);
+
+    useEffect(() => {
+        console.log("New contracts: ", contracts)
+    }, [contracts]);
 
     // FUNÇÕES DE LÓGICA AGORA VIVEM NO PAI
     const handleAddProduct = (productId: number, cmdt: number) => {
@@ -85,6 +105,23 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         setContracts(currentContracts => currentContracts.filter(c => c.ID_Contrato !== contractId));
     };
 
+    const handleInsertContract = (productId: number) => {
+        const newContract: ContractDTOInsert = {
+            Cont_ID_Cli: client?.id || 0,
+            Cont_ID_Prod: productId,
+            Cont_Comodato: 1
+        };
+
+        setContractsInsert(newContract);
+        console.log("Inserting contract:", newContract);
+        createContract(newContract);
+        handleClose();
+    };
+
+    const filteredProduct = products.filter(product =>
+        product.Prod_CodProduto.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <Box padding={10}>
             <Modal
@@ -99,13 +136,22 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }} />
 
-                    <TextField variant="filled" label="Nome do Produto" name="nomeProduto" required placeholder="Digite o nome do produto" fullWidth sx={{ marginBottom: 2, '& .MuiInputBase-input::placeholder': {
-                        color: '#000000ff',
-                        opacity: 1,
-                    }, }}/>
-                    <Button>
-                        <Typography>Adicionar</Typography>
-                    </Button>   
+                    {/* <TextField variant="filled"  label="Código do Produto" name="codigoProduto" required placeholder="Digite o código do produto" fullWidth sx={{ marginBottom: 2 }}/> */}
+                    <SearchField onSearchChange={setSearchTerm} />
+                    <Box sx={{ maxHeight: "10vh", overflowY: "scroll", marginTop: 2 }}>
+                        {filteredProduct.map((product) => (
+                            <Box key={product.ID_Prod} sx={{ display: 'flex', justifyContent: 'space-between', padding: 1, borderBottom: '1px solid #ccc' }}>
+                                <Typography>{product.Prod_Nome} - {product.Prod_Valor}</Typography>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleInsertContract(product.ID_Prod)}
+                                >
+                                    Adicionar
+                                </Button>
+                            </Box>
+                        ))}
+                    </Box>
                 </Box>
             </Modal>
             <Typography variant="h4" color="text.primary" textAlign={"center"} paddingTop={10}>

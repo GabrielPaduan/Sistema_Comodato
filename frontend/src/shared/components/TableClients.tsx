@@ -43,7 +43,7 @@ export const TableClients: React.FC = () => {
                         filteredClients.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} sx={{ textAlign: "center", fontSize: 20 }}>
-                                    Nenhum contrato cadastrado
+                                    Nenhum cliente cadastrado
                                 </TableCell>
                             </TableRow>
                         ) : (

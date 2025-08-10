@@ -18,3 +18,15 @@ export const createContract = async (req: express.Request, res: express.Response
         res.status(500).json({ error: error.message });
     }
 };
+
+export const getContractByClientId = async (req: express.Request, res: express.Response) => {
+    try {
+        if (!req.params.id) {
+            return res.status(400).json({ error: 'Client ID is required' });
+        }
+        const contracts = await contractService.findContractsByClientId(req.params.id);
+        res.status(200).json(contracts);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};

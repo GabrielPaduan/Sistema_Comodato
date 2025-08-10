@@ -12,3 +12,9 @@ export const createNewContract = async (contractData: Omit<ContractDTO, 'id'>): 
     if (error) throw error;
     return data;
 };
+
+export const findContractsByClientId = async (clientId: string): Promise<ContractDTO[]> => {
+    const { data, error } = await supabase.from('Contratos').select('*').eq('Cont_ID_Cli', clientId);
+    if (error) throw error;
+    return data;
+};

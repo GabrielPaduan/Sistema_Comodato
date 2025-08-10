@@ -1,5 +1,5 @@
 import api from '../services/api'; // Importa nossa instância centralizada do axios
-import { ContractDTO } from '../utils/DTOS'; // Supondo que você também tenha um arquivo de tipos no frontend
+import { ContractDTO, ContractDTOInsert } from '../utils/DTOS'; // Supondo que você também tenha um arquivo de tipos no frontend
 
 // Função para buscar TODOS os contratos
 export const getAllContracts = async (): Promise<ContractDTO[]> => {
@@ -13,9 +13,14 @@ export const getContractById = async (id: number): Promise<ContractDTO> => {
   return response.data;
 };
 
+export const getContractByClientId = async (id: number): Promise<ContractDTO> => {
+  const response = await api.get(`/contratos/${id}`);
+  return response.data;
+};
+
 // Função para CRIAR um novo contrato
 // Omit<ContractDTO, 'id'> significa que pegamos todos os campos do ContractDTO, exceto o 'id'
-export const createContract = async (contractData: Omit<ContractDTO, 'id'>): Promise<ContractDTO> => {
+export const createContract = async (contractData: Omit<ContractDTOInsert, 'id'>): Promise<ContractDTOInsert> => {
   const response = await api.post('/contratos', contractData);
   return response.data;
 };

@@ -23,30 +23,39 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>REMOVER</TableCell>
                 </TableHead>
                 <TableBody>
-                    {contracts.map((contract) => {
-                        const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-                        if (!product) return null;
+                    {
+                    contracts.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={7} sx={{ textAlign: "center", fontSize: 20 }}>Nenhum contrato cadastrado</TableCell>
+                        </TableRow>
+                    ) : (
+                        contracts.map((contract) => {
+                            const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
+                            if (!product) return null;
 
-                        return (
-                            <TableRow key={contract.ID_Contrato} hover>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{contract.Cont_Comodato}</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Nome}</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_Valor.toFixed(2)}</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
-                                    <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
-                                        <Button onClick={() => onRemoveProduct(product.ID_Prod)}><Icon sx={{ fontSize: 30 }}>remove_circle</Icon></Button>
-                                            <Typography sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Qtde}</Typography>
-                                        <Button onClick={() => onAddProduct(product.ID_Prod, contract.Cont_Comodato)}><Icon sx={{ fontSize: 30 }}>add_circle</Icon></Button>
-                                    </Box>
-                                </TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Estoque}</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_ValorTotal.toFixed(2)}</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
-                                    <Button onClick={() => onRemoveContract(contract.ID_Contrato)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                            return (
+                                <TableRow key={contract.ID_Contrato} hover>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{contract.Cont_Comodato}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Nome}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_Valor.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
+                                        <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+                                            <Button onClick={() => onRemoveProduct(product.ID_Prod)}><Icon sx={{ fontSize: 30 }}>remove_circle</Icon></Button>
+                                                <Typography sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Qtde}</Typography>
+                                            <Button onClick={() => onAddProduct(product.ID_Prod, contract.Cont_Comodato)}><Icon sx={{ fontSize: 30 }}>add_circle</Icon></Button>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Estoque}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_ValorTotal.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
+                                        <Button onClick={() => onRemoveContract(contract.ID_Contrato)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })
+                    )
+                    
+                    }
                 </TableBody>
             </Table>
         </TableContainer>

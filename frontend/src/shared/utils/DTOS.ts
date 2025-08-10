@@ -39,6 +39,12 @@ export interface ContractDTO {
     Cont_Comodato: number;
 }
 
+export interface ContractDTOInsert {
+    Cont_ID_Cli: number;
+    Cont_ID_Prod: number;
+    Cont_Comodato: number;
+}
+
 export interface TableContractProps {
     client: ClientDTO | null;
     contracts: ContractDTO[];

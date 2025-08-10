@@ -12,6 +12,11 @@ export const getProductById = async (id: number): Promise<ProductDTO> => {
   return response.data;
 };
 
+export const getProductByContractId = async (id: number): Promise<ProductDTO> => {
+  const response = await api.get(`/produtos/${id}`);
+  return response.data;
+};
+
 export const createProduct = async (productData: Omit<ProductDTO, 'id'>): Promise<ProductDTO> => {
   const response = await api.post('/produtos', productData);
   return response.data;
