@@ -6,7 +6,7 @@ import React from "react";
 interface CustomTableContractProps extends TableContractProps {
     onAddProduct: (productId: number, cmdt: number) => void;
     onRemoveProduct: (productId: number) => void;
-    onRemoveContract: (contractId: number) => void;
+    onRemoveContract: (contractId: number, productId: number) => void;
 }
 
 export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct, onRemoveContract }) => {
@@ -48,7 +48,7 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Estoque}</TableCell>
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_ValorTotal.toFixed(2)}</TableCell>
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
-                                        <Button onClick={() => onRemoveContract(contract.ID_Contrato)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
+                                        <Button onClick={() => onRemoveContract(contract.ID_Contrato, contract.Cont_ID_Prod)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
                                     </TableCell>
                                 </TableRow>
                             );

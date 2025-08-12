@@ -8,12 +8,12 @@ export const getAllProducts = async (): Promise<ProductDTO[]> => {
 };
 
 export const getProductById = async (id: number): Promise<ProductDTO> => {
-  const response = await api.get(`/produtos/${id}`);
+  const response = await api.get(`/produtos/search/${id}`);
   return response.data;
 };
 
 export const getProductByContractId = async (id: number): Promise<ProductDTO> => {
-  const response = await api.get(`/produtos/${id}`);
+  const response = await api.get(`/produtos/product-contract/${id}`);
   return response.data;
 };
 

@@ -13,12 +13,38 @@ export const createNewProduct = async (productData: Omit<ProductDTO, 'id'>): Pro
     return data;
 };
 
+export const findProductById = async (id: number): Promise<ProductDTO | null> => {
+  const { data, error } = await supabase.from('Produtos').select('*').eq('ID_Prod', id).single();
+  if (error) {
+    console.error('Erro ao buscar produto por ID:', error);
+    return null;
+  }
+  return data;
+};
+
 export const findProductByContractId = async (contractId: number): Promise<ProductDTO | null> => {
-    const { data, error } = await supabase
-        .from('Produtos')
-        .select('*')
-        .eq('contract_id', contractId)
-        .single();
-    if (error) throw error;
-    return data;
+  // Busca o contrato e faz join para trazer o produto relacionado diretamente
+
+  console.log("Buscando produto por ID do contrato:", contractId);
+
+  const { data, error } = await supabase
+    .from('Contratos')
+    .select(`
+      Produtos ( * )
+    `)
+    .eq('ID_Contrato', contractId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    console.error('Erro ao buscar produto do contrato:', error);
+    throw error;
+  }
+
+  const product: ProductDTO | undefined = Array.isArray(data.Produtos) ? data.Produtos[0] : data.Produtos;
+  console.log('Produto encontrado:', product);
+  // Retorna o produto diretamente, garantindo que não seja undefined.
+  return product ?? null;
 };

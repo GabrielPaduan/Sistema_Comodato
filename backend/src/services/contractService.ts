@@ -18,3 +18,8 @@ export const findContractsByClientId = async (clientId: string): Promise<Contrac
     if (error) throw error;
     return data;
 };
+
+export const removeContract = async (contractId: number): Promise<void> => {
+    const { error } = await supabase.from('Contratos').delete().eq('ID_Contrato', contractId);
+    if (error) throw error;
+};

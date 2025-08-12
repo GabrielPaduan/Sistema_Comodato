@@ -30,3 +30,15 @@ export const getContractByClientId = async (req: express.Request, res: express.R
         res.status(500).json({ error: error.message });
     }
 };
+
+export const removeContract = async (req: express.Request, res: express.Response) => {
+    try {
+        if (!req.params.id) {
+            return res.status(400).json({ error: 'Contract ID is required' });
+        }
+        await contractService.removeContract(Number(req.params.id));
+        res.status(204).send();
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};

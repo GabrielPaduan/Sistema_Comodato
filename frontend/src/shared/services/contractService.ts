@@ -18,9 +18,12 @@ export const getContractByClientId = async (id: number): Promise<ContractDTO> =>
   return response.data;
 };
 
-// Função para CRIAR um novo contrato
-// Omit<ContractDTO, 'id'> significa que pegamos todos os campos do ContractDTO, exceto o 'id'
 export const createContract = async (contractData: Omit<ContractDTOInsert, 'id'>): Promise<ContractDTOInsert> => {
+  console.log(contractData)
   const response = await api.post('/contratos', contractData);
   return response.data;
+};
+
+export const removeContract = async (id: number): Promise<void> => {
+  await api.delete(`/contratos/${id}`);
 };

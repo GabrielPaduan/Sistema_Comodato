@@ -19,12 +19,25 @@ export const createProduct = async (req: express.Request, res: express.Response)
     }
 };
 
+export const getProductById = async (req: express.Request, res: express.Response) => {
+    try {
+        const product = await productService.findProductById(Number(req.params.id));
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        res.status(200).json(product);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export const getProductByContractId = async (req: express.Request, res: express.Response) => {
     try {
         if (!req.params.id) {
             return res.status(400).json({ message: "Contract ID is required" });
         }
         const product = await productService.findProductByContractId(Number(req.params.id));
+        // console.log("Product:", product);
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
