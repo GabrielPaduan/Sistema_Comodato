@@ -23,3 +23,8 @@ export const removeContract = async (contractId: number): Promise<void> => {
     const { error } = await supabase.from('Contratos').delete().eq('ID_Contrato', contractId);
     if (error) throw error;
 };
+
+export const updateContract = async (contractId: number, cmdt: number): Promise<void> => {
+    const { error } = await supabase.from('Contratos').update({ Cont_Comodato: cmdt }).eq('ID_Contrato', contractId).select();
+    if (error) throw error;
+};

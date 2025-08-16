@@ -1,4 +1,4 @@
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, Modal, TablePagination, TextField, Typography } from "@mui/material";
 import { ClientDTO, ContractDTO, ContractDTOInsert, LayoutBaseContratoProps, ProductDTO } from "../utils/DTOS";
 import React, { useEffect, useState } from "react";
 import { TableContract } from "./TableContract";
@@ -7,8 +7,9 @@ import { getClientById } from "../services/clientService"; // Supondo que você 
 import { GenericButton } from "./GenericButton";
 import { getAllProducts, getProductByContractId, getProductById } from "../services/productService";
 import { SearchField } from "./searchField";
-import { createContract, getContractByClientId } from "../services/contractService";
+import { createContract, getContractByClientId, updateContract } from "../services/contractService";
 import { api } from "../services";
+import Checkbox from "@mui/material/Checkbox";
 
 const style = {
   position: 'absolute',
@@ -30,13 +31,28 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const [productsClient, setProductsClient] = useState<ProductDTO[]>([]);
     const [open, setOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [cmdt, setCmdt] = useState<number | 0>(0);
+    const [cmdt, setCmdt] = useState<number | 1>(1);
+    const[page, setPage] = useState(0);
+    const[rowsPerPage, setRowsPerPage] = useState(5);
+    const[selectedProduct, setSelectedProduct] = useState<number>(0);
+
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+        setPage(newPage);
+    }
+    
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     const handleOpen = () => {
         setOpen(true);
     };
-    const handleClose = () => setOpen(false);
-    
+    const handleClose = () => {
+        setCmdt(1);
+        setOpen(false);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             
@@ -47,27 +63,37 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     setClient(clientData);
                     console.log(clientData)
                     const productData = await getAllProducts();
+                    productData.filter(p => p.Prod_Valor > 0);
                     setProducts(productData);
                     console.log(productData)
                     const contractData = await getContractByClientId(id);
                     setContracts(Array.isArray(contractData) ? contractData : [contractData]);
-                    for (const contract of Array.isArray(contractData) ? contractData : [contractData]) {
-                        const productData = await getProductByContractId(contract.ID_Contrato);
+                    
+                    const contractsArray = Array.isArray(contractData) ? contractData : [contractData];
+                    
+                    const productPromises = contractsArray.map(contract => getProductByContractId(contract.ID_Contrato));
+                    
+                    const productsFromContracts = await Promise.all(productPromises);
+                    productsFromContracts.forEach(productData => {
                         if (productData != null) {
-                            if (productsClient.map(p => p.ID_Prod).includes(productData.ID_Prod)) {
-                                setProductsClient(prevProducts => prevProducts.map(p => p.ID_Prod === productData.ID_Prod ? productData : p));
-                            } else {
-                                setProductsClient(prevProducts => [...prevProducts, ...(Array.isArray(productData) ? productData : [productData])]);
-                            }
+                            setProductsClient(prevProducts => [...prevProducts, ...(Array.isArray(productData) ? productData : [productData])]);
                         }
-                    }
+                    });
                 } catch (err) {
                     console.error("Erro ao buscar dados:", err);
                 }
             }
         };
         fetchData();
-    }, [id]); // Executa sempre que o ID mudar
+    }, []); 
+
+    useEffect(() => {
+        console.log("Products: ", productsClient)
+    }, [productsClient]);
+
+    useEffect(() => {
+        console.log("Contracts: ", contracts);
+    }, [contracts]);
 
     useEffect(() => {
             const fetchDataContInsert = async () => {
@@ -86,10 +112,6 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         };
         fetchDataContInsert();
     }, [contractsInsert]);
-
-    useEffect(() => {
-        console.log("Products Client: ", productsClient);
-    }, [productsClient]);
 
     // FUNÇÕES DE LÓGICA AGORA VIVEM NO PAI
     const handleAddProduct = (productId: number, cmdt: number) => {
@@ -134,6 +156,18 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         createContract(newContract);
         handleClose();
     };
+    
+    const handleEditContract = (contractId: number, cmdt: number) => {
+        const updatedContract = contracts.find(c => c.ID_Contrato === contractId);
+        const newContracts = contracts.filter(c => c.ID_Contrato !== contractId);
+
+        if (updatedContract) {
+            updatedContract.Cont_Comodato = cmdt;
+            setContractsInsert(updatedContract);
+            setContracts(newContracts);
+            updateContract(updatedContract.ID_Contrato, cmdt);
+        }
+    };
 
     const filteredProduct = products.filter(product =>
         product.Prod_CodProduto.toLowerCase().includes(searchTerm.toLowerCase())
@@ -156,30 +190,56 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     {/* <TextField variant="filled"  label="Código do Produto" name="codigoProduto" required placeholder="Digite o código do produto" fullWidth sx={{ marginBottom: 2 }}/> */}
                     <SearchField onSearchChange={setSearchTerm} />
                     <Box sx={{ maxHeight: "20vh", overflowY: "scroll", marginTop: 2 }}>
-                        {filteredProduct.map((product) => (
+                        {filteredProduct.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
                             <Box key={product.ID_Prod} sx={{ display: 'flex', justifyContent: 'space-between', padding: 1, borderBottom: '1px solid #ccc' }}>
-                                <Typography width={"50%"}>{product.Prod_Nome} - {product.Prod_Valor}</Typography>
-                                <TextField
-                                    inputProps={{ min: 0 }}
-                                    placeholder="Comodato"
-                                    id={`quantity-${product.ID_Prod}`}
-                                    name={`quantity-${product.ID_Prod}`}
-                                    sx={{ width: '29%' }}
-                                    variant="outlined"
-                                    type="number"
-                                    value={cmdt}
-                                    onChange={(e) => setCmdt(Number(e.target.value))}
+                                <Checkbox
+                                    checked={product.ID_Prod === selectedProduct}
+                                    onChange={(e) => setSelectedProduct(e.target.checked ? product.ID_Prod : 0)}
+                                    sx={{ width: '19%', color: 'grey' }}
+                                    color="secondary"
                                 />
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleInsertContract(product.ID_Prod, cmdt)}
-                                    sx={{ width: '19%' }} // Ajuste a largura do botão conforme necessário
-                                >
-                                    Adicionar
-                                </Button>
+                                <Typography width={"50%"}>{product.Prod_Nome} || R${product.Prod_Valor}</Typography>
                             </Box>
                         ))}
+                    </Box>
+                    <TablePagination
+                        component="div"
+                        count={filteredProduct.length}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        rowsPerPageOptions={[5, 10, 15]}
+                    />
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} gap={2}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-evenly"} width={"60%"} height={"100%"}>
+                            <Typography component="label" htmlFor={`quantity`} variant="h6">
+                                Comodato:
+                            </Typography>
+                            <TextField
+                                id={`quantity`}
+                                name={`quantity`}
+                                variant="outlined"
+                                value={cmdt}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    setCmdt(isNaN(value) ? 1 : value);
+                                }}
+                                inputProps = {{ style: { padding: "8px" } }}
+                            />
+                        </Box>
+                        <Box width={"40%"} display={"flex"} justifyContent={"center"} height={"100%"} gap={1}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => handleInsertContract(selectedProduct, cmdt)}
+                            >
+                                <Typography variant="h6" fontSize={16}> Adicionar</Typography>
+                            </Button>
+                            <Button onClick={handleClose} variant="contained" color="primary">
+                                <Typography variant="h6" fontSize={16}>Voltar</Typography>
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             </Modal>
@@ -193,6 +253,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                 onAddProduct={handleAddProduct}    
                 onRemoveProduct={handleRemoveProduct}
                 onRemoveContract={handleRemoveContract}
+                onEditContract={handleEditContract}
             />
             <Box display={"flex"} alignItems="center" justifyContent="center" gap={2} mt={4}>
                 <Button variant="contained" color="primary" sx={{ padding: "15px" }} onClick={handleOpen}>

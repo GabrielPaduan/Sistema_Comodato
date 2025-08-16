@@ -1,4 +1,4 @@
-import { Box, Button, Icon, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, InputAdornment, TextField } from "@mui/material"
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search";
 import { ClientDTO } from "../utils/DTOS";
 import React, { useEffect, useState } from "react";
@@ -8,6 +8,17 @@ import { SearchField } from "./searchField";
 export const TableClients: React.FC = () => {
     const [clientsData, setClientsData] = React.useState<ClientDTO[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const[page, setPage] = useState(0);
+    const[rowsPerPage, setRowsPerPage] = useState(5);
+    
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+        setPage(newPage);
+    }
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     useEffect (() => {
         const fetchClients = async () => {
@@ -47,7 +58,7 @@ export const TableClients: React.FC = () => {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            filteredClients.map((client) => (
+                            filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((client) => (
                                 <TableRow
                                     id={String(client.id)}
                                     key={client.id}
@@ -64,6 +75,15 @@ export const TableClients: React.FC = () => {
                     }
                     </TableBody>
                 </Table>
+                <TablePagination
+                    component="div"
+                    count={filteredClients.length}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 15]}
+                />
             </TableContainer>
         </Box>
     )

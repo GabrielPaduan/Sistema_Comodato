@@ -27,3 +27,8 @@ export const createContract = async (contractData: Omit<ContractDTOInsert, 'id'>
 export const removeContract = async (id: number): Promise<void> => {
   await api.delete(`/contratos/${id}`);
 };
+
+export const updateContract = async (id: number, cmdt: number): Promise<ContractDTO> => {
+  const response = await api.put(`/contratos/${id}/${cmdt}`);
+  return response.data;
+};

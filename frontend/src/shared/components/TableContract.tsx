@@ -1,15 +1,17 @@
 import { Box, Button, Icon, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { TableContractProps } from "../utils/DTOS";
-import React from "react";
+import React, { useState } from "react";
 
 // Adicione as funções onAdd e onRemove nas props
 interface CustomTableContractProps extends TableContractProps {
     onAddProduct: (productId: number, cmdt: number) => void;
     onRemoveProduct: (productId: number) => void;
     onRemoveContract: (contractId: number, productId: number) => void;
+    onEditContract: (contractId: number, cmdt: number) => void;
 }
 
-export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct, onRemoveContract }) => {
+export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct, onRemoveContract, onEditContract }) => {
+    
     return (
         <TableContainer component={"table"} sx={{ width: "50%", margin: "auto", paddingTop: 10, cursor: "default" }}>
             <Table>
@@ -21,6 +23,7 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>ESTOQUE</TableCell>
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>VALOR TOTAL</TableCell>
                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>REMOVER</TableCell>
+                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>EDITAR    </TableCell>
                 </TableHead>
                 <TableBody>
                     {
@@ -50,6 +53,10 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
                                         <Button onClick={() => onRemoveContract(contract.ID_Contrato, contract.Cont_ID_Prod)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
                                     </TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
+                                        <Button onClick={() => onEditContract(contract.ID_Contrato, 15)}><Icon sx={{ fontSize: 40 }}>edit</Icon></Button>
+                                    </TableCell>
+                                    
                                 </TableRow>
                             );
                         })

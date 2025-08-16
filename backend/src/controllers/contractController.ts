@@ -42,3 +42,15 @@ export const removeContract = async (req: express.Request, res: express.Response
         res.status(500).json({ error: error.message });
     }
 };
+
+export const updateContract = async (req: express.Request, res: express.Response) => {
+    try {
+        if (!req.params.id) {
+            return res.status(400).json({ error: 'Contract ID is required' });
+        }
+        const updatedContract = await contractService.updateContract(Number(req.params.id), Number(req.params.cmdt));
+        res.status(200).json(updatedContract);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
