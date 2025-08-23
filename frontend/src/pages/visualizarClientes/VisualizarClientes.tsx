@@ -1,12 +1,13 @@
 import { Box, TableCell, Typography } from "@mui/material";
 import React from "react";
-import { GenericButton, TableClients } from "../../shared/components";
+import { DefaultHeader, GenericButton, TableClients } from "../../shared/components";
 
 
 export class VisualizarClientes extends React.Component {
   render() {
       return (
         <>  
+          <DefaultHeader />
           <Box textAlign={"center"}>
             <Typography variant="h4" color="text.primary" textAlign={"center"} paddingTop={10}>
               Listagem de Clientes
