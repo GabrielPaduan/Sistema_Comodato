@@ -264,7 +264,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     color="primary"
                     sx={{ padding: "15px" }}
                     onClick={() => client && generateReport(client, contracts, productsClient)}
-                    disabled={!client}
+                     disabled={!client}
                 >
                     <Typography variant="h6">Gerar Relatório</Typography>
                 </Button>
