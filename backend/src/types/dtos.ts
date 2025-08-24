@@ -6,6 +6,15 @@ export interface ClientDTO {
     cli_typeDoc: number;
     cli_end: string;
     cli_cep: string;   
+    cli_dddTel: string;
+    cli_telefone: string;
+    cli_dddCel: string;
+    cli_cidade: string;
+    cli_celular: string;
+    cli_endNum: string;
+    cli_bairro: string;
+    cli_uf: string;
+    cli_insEstadual: string;
 }
 
 export interface ClientDTOInsert {
@@ -14,7 +23,16 @@ export interface ClientDTOInsert {
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
-    cli_cep: string;       
+    cli_cep: string;   
+    cli_dddTel: string;
+    cli_telefone: string;
+    cli_dddCel: string;
+    cli_cidade: string;
+    cli_celular: string;
+    cli_endNum: string;
+    cli_bairro: string;
+    cli_uf: string;
+    cli_insEstadual: string;
 }
 
 export interface ProductDTO {

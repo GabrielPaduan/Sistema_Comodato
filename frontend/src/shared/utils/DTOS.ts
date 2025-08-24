@@ -5,7 +5,16 @@ export interface ClientDTO {
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
-    cli_cep: string;      
+    cli_cep: string;   
+    cli_dddTel: string;
+    cli_telefone: string;
+    cli_dddCel: string;
+    cli_cidade: string;
+    cli_celular: string;
+    cli_endNum: string;
+    cli_bairro: string;
+    cli_uf: string;
+    cli_insEstadual: string;    
 }
 
 export interface ClientDTOInsert {
@@ -14,7 +23,16 @@ export interface ClientDTOInsert {
     cli_doc: string;
     cli_typeDoc: number;
     cli_end: string;
-    cli_cep: string;      
+    cli_cep: string;   
+    cli_dddTel: string;
+    cli_telefone: string;
+    cli_dddCel: string;
+    cli_cidade: string;
+    cli_celular: string;
+    cli_endNum: string;
+    cli_bairro: string;
+    cli_uf: string;
+    cli_insEstadual: string;
 }
 
 export interface ProductDTO {
@@ -50,7 +68,18 @@ export interface TableContractProps {
     contracts: ContractDTO[];
     products: ProductDTO[];
 }
-
 export interface LayoutBaseContratoProps {
     id: number;
+}
+
+export interface UserDTO {
+    usu_id: number;
+    usu_nome: string;
+    usu_email: string;
+    usu_typeUser: number;
+}
+
+export interface LoginDTO {
+    email: string;
+    password: string;
 }

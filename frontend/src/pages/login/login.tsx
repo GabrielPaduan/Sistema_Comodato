@@ -1,0 +1,18 @@
+import { Box, Typography } from "@mui/material";
+import React from "react";
+import { LoginForm } from "../../shared/components";
+
+export class Login extends React.Component {
+    render() {
+        return (
+            <>  
+                <Box textAlign={"center"}>
+                    <Typography variant="h4" color="text.primary" textAlign={"center"} paddingTop={10}>
+                        Login                    
+                    </Typography>
+                    <LoginForm />
+                </Box>
+            </>
+        );
+    }
+}
