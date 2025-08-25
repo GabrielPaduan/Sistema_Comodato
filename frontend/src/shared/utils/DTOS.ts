@@ -88,9 +88,21 @@ export interface PdfStructDTO {
     id: number;
     PDF_Client_Id: number;
     PDF_Status: number;
+    PDF_Generated_Date: string;
 }
 
 export interface PdfStructInsertDTO {
     PDF_Client_Id: number;
     PDF_Status: number;
+    PDF_Generated_Date: string;
+}
+
+export interface PdfStructCompleteDTO {
+    id: number;    
+    PDF_Status: number;
+    PDF_Generated_Date: string;
+    PDF_Client: ClientDTO | null;
+    PDF_Contracts: ContractDTO[];
+    PDF_Products: ProductDTO[];
+
 }

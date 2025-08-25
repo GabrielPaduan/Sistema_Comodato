@@ -132,7 +132,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const createReport = async (client: ClientDTO, contracts: ContractDTO[], productsClient: ProductDTO[]) => {
         try {
             handleShowReport();
-            // await createPDFContracts({ PDF_Client_Id: client.id, PDF_Status: 0 });
+            await createPDFContracts({ PDF_Client_Id: client.id, PDF_Status: 0, PDF_Generated_Date: new Date().toISOString() });
             // generateReport(client, contracts, productsClient);
         } catch (error) {
             console.error("Erro ao criar PDF:", error);
@@ -343,8 +343,8 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                             variant="contained"
                             color="primary"
                             sx={{ padding: "15px" }}
-                            onClick={() => client && createReport(client, contracts, productsClient)}
                             disabled={!client}
+                            onClick={() => handleShowReport()}
                         >
                             <Typography variant="h6">Prévia Relatório</Typography>
                         </Button>

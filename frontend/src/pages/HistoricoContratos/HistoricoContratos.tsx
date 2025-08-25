@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { DefaultHeader, GenericButton } from "../../shared/components";
+import { DefaultHeader, GenericButton, TableHistoricoContract } from "../../shared/components";
 import React from "react";
 
 export class HistoricoContratos extends React.Component {
@@ -9,6 +9,7 @@ export class HistoricoContratos extends React.Component {
         <Box textAlign={"center"}>
             <DefaultHeader />
             <Typography variant="h4" paddingTop={"10px"}>Histórico de Contratos</Typography>
+            <TableHistoricoContract />
             <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
         </Box>
       </>

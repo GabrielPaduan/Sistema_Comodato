@@ -24,3 +24,5 @@ export const findClientById = async (id: number): Promise<ClientDTO | null> => {
     if (error) throw error;
     return data;
 };
+
+
