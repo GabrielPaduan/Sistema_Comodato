@@ -1,10 +1,10 @@
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
-export const GenericButton: React.FC<{ name: string, type: "button" | "submit", link: string }> = ({ name, type, link }) => {
+export const GenericButton: React.FC<{ name: string, type: "button" | "submit", link: string, onClick?: () => void }> = ({ name, type, link, onClick }) => {
     return (
         <Link to={link} style={{ textDecoration: 'none' }}>
-            <Button variant="contained" color="primary" type={type} sx={{ margin: '10px auto', padding: "15px" }}>
+            <Button variant="contained" color="primary" type={type} sx={{ margin: '10px auto', padding: "15px" }} onClick={onClick}>
                 <Typography variant="h6" color="text.secondary">
                 {name}
                 </Typography>

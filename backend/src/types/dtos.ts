@@ -56,3 +56,14 @@ export interface ContractDTO {
     Cont_ID_Prod: number;
     Cont_Comodato: number;
 }
+
+export interface PdfStructDTO {
+    id: number;
+    PDF_Client_Id: number;
+    PDF_Status: number;
+}
+
+export interface PdfStructInsertDTO {
+    PDF_Client_Id: number;
+    PDF_Status: number;
+}

@@ -7,9 +7,10 @@ import { getClientById } from "../services/clientService"; // Supondo que você 
 import { GenericButton } from "./GenericButton";
 import { getAllProducts, getProductByContractId, getProductById } from "../services/productService";
 import { SearchField } from "./searchField";
-import { createContract, getContractByClientId, updateContract } from "../services/contractService";
-import { api } from "../services";
+import { createContract, getContractByClientId, removeContract } from "../services/contractService";
 import Checkbox from "@mui/material/Checkbox";
+import { createPDFContracts } from "../services/pdfContract";
+import { PreviewReport } from "./PreviewReport";
 
 const style = {
   position: 'absolute',
@@ -32,9 +33,10 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const [open, setOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [cmdt, setCmdt] = useState<number | 1>(1);
-    const[page, setPage] = useState(0);
-    const[rowsPerPage, setRowsPerPage] = useState(3);
-    const[selectedProduct, setSelectedProduct] = useState<number>(0);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(3);
+    const [selectedProduct, setSelectedProduct] = useState<number>(0);
+    const [showReport, setShowReport] = useState<boolean>(false);
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
@@ -52,6 +54,14 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         setCmdt(1);
         setOpen(false);
     }
+
+    const handleShowReport = () => {
+        if (!showReport) {
+            setShowReport(true);
+        } else {
+            setShowReport(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,24 +106,39 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     }, [contracts]);
 
     useEffect(() => {
+        try {
             const fetchDataContInsert = async () => {
-            const contractData = await getContractByClientId(id);
-            setContracts(Array.isArray(contractData) ? contractData : [contractData]);
-            if (contractsInsert && contractsInsert.Cont_ID_Prod !== undefined) {
-            const productData = await getProductById(contractsInsert.Cont_ID_Prod);
-            if (productData != null) {
-                if (productsClient.map(p => p.ID_Prod).includes(productData.ID_Prod)) {
-                    setProductsClient(prevProducts => prevProducts.map(p => p.ID_Prod === productData.ID_Prod ? productData : p));
-                } else {
-                    setProductsClient(prevProducts => [...prevProducts, ...(Array.isArray(productData) ? productData : [productData])]);
+                const contractData = await getContractByClientId(id);
+                setContracts(Array.isArray(contractData) ? contractData : [contractData]);
+                if (contractsInsert && contractsInsert.Cont_ID_Prod !== undefined) {
+                const productData = await getProductById(contractsInsert.Cont_ID_Prod);
+                if (productData != null) {
+                    if (productsClient.map(p => p.ID_Prod).includes(productData.ID_Prod)) {
+                        setProductsClient(prevProducts => prevProducts.map(p => p.ID_Prod === productData.ID_Prod ? productData : p));
+                    } else {
+                        setProductsClient(prevProducts => [...prevProducts, ...(Array.isArray(productData) ? productData : [productData])]);
+                    }
                 }
-            }
-            }
-        };
-        fetchDataContInsert();
+                }
+            };
+            fetchDataContInsert();
+        } catch (err) {
+            console.error("Erro ao buscar dados:", err);
+        }
+        
     }, [contractsInsert]);
 
-    // FUNÇÕES DE LÓGICA AGORA VIVEM NO PAI
+
+    const createReport = async (client: ClientDTO, contracts: ContractDTO[], productsClient: ProductDTO[]) => {
+        try {
+            handleShowReport();
+            // await createPDFContracts({ PDF_Client_Id: client.id, PDF_Status: 0 });
+            // generateReport(client, contracts, productsClient);
+        } catch (error) {
+            console.error("Erro ao criar PDF:", error);
+        }
+    }
+
     const handleAddProduct = (productId: number, cmdt: number) => {
         setProductsClient(currentProducts =>
             currentProducts.map(p => {
@@ -142,7 +167,12 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const handleRemoveContract = (contractId: number, productId: number) => {
         setContracts(currentContracts => currentContracts.filter(c => c.ID_Contrato !== contractId));
         setProductsClient(currentProducts => currentProducts.filter(p => p.ID_Prod !== productId));
-        api.delete(`/contratos/${contractId}`);
+        try {
+            removeContract(contractId);
+        } catch (err) {
+            console.error("Erro ao remover contrato:", err);
+        }
+        // api.delete(`/contratos/${contractId}`);
     };
 
     const handleInsertContract = (productId: number, cmdt: number) => {
@@ -153,22 +183,13 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         };
 
         setContractsInsert(newContract);
+        try {
         createContract(newContract);
+        } catch(err) {
+            console.error("Erro ao criar contrato:", err);
+        }
         handleClose();
     };
-    
-    // const handleEditContract = (contractId: number, cmdt: number) => {
-    //     const updatedContract = contracts.find(c => c.ID_Contrato === contractId);
-    //     const newContracts = contracts.filter(c => c.ID_Contrato !== contractId);
-
-    //     if (updatedContract) {
-    //         updatedContract.Cont_Comodato = cmdt;
-    //         setContractsInsert(updatedContract);
-    //         setContracts(newContracts);
-    //         updateContract(updatedContract.ID_Contrato, cmdt);
-    //         window.location.reload();
-    //     }
-    // };
 
     const filteredProduct = products.filter(product =>
         product.Prod_CodProduto.toLowerCase().includes(searchTerm.toLowerCase())
@@ -303,29 +324,48 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
             <Typography variant="h4" color="text.primary" textAlign={"center"} paddingTop={10}>
                         {client?.cli_razaoSocial ? `Contrato de ${client.cli_razaoSocial}` : "Carregando Contrato..."}
             </Typography>
-            <TableContract
-                client={client}
-                contracts={contracts}
-                products={productsClient}
-                onAddProduct={handleAddProduct}    
-                onRemoveProduct={handleRemoveProduct}
-                onRemoveContract={handleRemoveContract}
-            />
-            <Box display={"flex"} alignItems="center" justifyContent="center" gap={2} mt={4}>
-                <Button variant="contained" color="primary" sx={{ padding: "15px" }} onClick={handleOpen}>
-                    <Typography variant="h6">Adicionar Produto</Typography>
-                </Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ padding: "15px" }}
-                    onClick={() => client && generateReport(client, contracts, productsClient)}
-                     disabled={!client}
-                >
-                    <Typography variant="h6">Gerar Relatório</Typography>
-                </Button>
-                <GenericButton name="Voltar" type="button" link="/visualizar-clientes" />
-            </Box>
+            {!showReport && (
+                <Box>
+                    <TableContract
+                        client={client}
+                        contracts={contracts}
+                        products={productsClient}
+                        onAddProduct={handleAddProduct}    
+                        onRemoveProduct={handleRemoveProduct}
+                        onRemoveContract={handleRemoveContract}
+                    />
+                
+                    <Box display={"flex"} alignItems="center" justifyContent="center" gap={2} mt={4}>
+                        <Button variant="contained" color="primary" sx={{ padding: "15px" }} onClick={handleOpen}>
+                            <Typography variant="h6">Adicionar Produto</Typography>
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            sx={{ padding: "15px" }}
+                            onClick={() => client && createReport(client, contracts, productsClient)}
+                            disabled={!client}
+                        >
+                            <Typography variant="h6">Prévia Relatório</Typography>
+                        </Button>
+                        <GenericButton name="Voltar" type="button" link="/visualizar-clientes" />
+                    </Box>
+                </Box>
+            )}
+            {showReport && client && (
+                <Box>
+                    <PreviewReport client={client} contracts={contracts} products={productsClient} />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ padding: "15px" }}
+                        onClick={() => client && createReport(client, contracts, productsClient)}
+                        disabled={!client}
+                    >
+                        <Typography variant="h6">Ocultar Relatório</Typography>
+                    </Button>
+                </Box>
+            )}
         </Box>
     );
 };

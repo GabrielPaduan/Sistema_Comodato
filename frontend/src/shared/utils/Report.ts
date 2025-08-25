@@ -1,60 +1,58 @@
+// src/services/reportService.ts
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ClientDTO, ContractDTO, ProductDTO } from "../utils/DTOS"; // Verifique o caminho dos seus DTOs
-import logo from '../assets/logo_empresa.jpg' // <-- 1. IMPORTE SUA LOGO AQUI (ex: de uma pasta 'assets')
+import { ClientDTO, ContractDTO, ProductDTO } from "../utils/DTOS";
+import logo from '../assets/logo_empresa.jpg'; // Verifique se o caminho da logo está correto
 
 export const generateReport = (client: ClientDTO, contracts: ContractDTO[], products: ProductDTO[]) => {
     const doc = new jsPDF();
-    const margin = 10;
-    let y = 0;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
 
-    // --- SEÇÃO DO CABEÇALHO (Reescrita) ---
-    y = margin;
-    doc.setDrawColor(0);
-    doc.rect(margin, y, 190, 50, 'D'); // x, y, width, height
+    // --- CABEÇALHO PROFISSIONAL ---
+    // Logo
+    doc.addImage(logo, 'PNG', doc.internal.pageSize.width - margin - 35, margin, 35, 35);
 
-    // Coluna da Esquerda do Cabeçalho
-
-    y = margin + 10; // Reset Y para alinhar
+    // Nome da Empresa
     doc.setFont('helvetica', 'bold');
-    doc.text(client.cli_razaoSocial ? client.cli_razaoSocial : "Razão Social não informada!", 25, y+5);
+    doc.setFontSize(16);
+    doc.text("O REI DO ÓLEO", doc.internal.pageSize.width - margin, margin + 45, { align: 'right' });
 
-    y += 14;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text("reidooleodistribuidora@gmail.com", doc.internal.pageSize.width - margin, margin + 50, { align: 'right' });
+    doc.text("(43) 98488-0539", doc.internal.pageSize.width - margin, margin + 54, { align: 'right' });
+
     doc.setFont('helvetica', 'bold');
-    doc.text(client.cli_end ? client.cli_end : "Endereço não informado!", margin + 15, y);
+    doc.setFontSize(11);
+    doc.text("CLIENTE:", margin, margin + 10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(client.cli_razaoSocial || "Razão Social não informada", margin, margin + 16);
+    doc.text(client.cli_end || "Endereço não informado", margin, margin + 22);
+    doc.text(client.cli_cidade ? `${client.cli_cidade} ${client.cli_uf}` : "Cidade não informada", margin, margin + 28);
+    doc.text(client.cli_email || "Email não informado", margin, margin + 34);
 
-    y += 9;
-    doc.setFont('helvetica', 'bold');
-    doc.text(client.cli_cidade ? `${client.cli_cidade} ${client.cli_uf}` : "Cidade não informada!", margin + 15, y);
-
-     // Reset Y para alinhar
-    doc.setFont('helvetica', 'bold');
-    doc.text(client.cli_email ? client.cli_email : "Email não informado!", margin + 15, y + 9);
-
-    doc.addImage(logo, 'PNG', 155, y - 27.5, 40, 40); // (imagem, tipo, x, y, largura, altura)
-
-
-    // Pula para depois do cabeçalho
-    y = 50 + margin + 10; 
-
-    // --- SEÇÃO DO TÍTULO DA TABELA ---
+    // Linha divisória
+    doc.setDrawColor(180, 180, 180);
+    doc.line(margin, margin + 60, doc.internal.pageSize.width - margin, margin + 60);
+    
+    let y = margin + 80;
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.text('INFORMAÇÕES DO CONTRATO', doc.internal.pageSize.width / 2, y, { align: 'center' });
-    y += 10;
+    y += 15;
 
-    // --- SEÇÃO DA TABELA (Ajustada) ---
+    // --- TABELA DE PRODUTOS ---
     const tableColumn = ["CMDT", "PRODUTOS", "VALOR UNITÁRIO", "QUANTIDADE", "VALOR TOTAL"];
-    const tableRows = contracts.map((contract) => {
+    const tableRows = contracts.map(contract => {
         const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-        const qtde = product?.Prod_Qtde ?? 0;
-        const valor = product?.Prod_Valor ?? 0;
-        const valorTotal = qtde * valor;
+        const valorTotal = (product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0);
         return [
             contract.Cont_Comodato,
             product?.Prod_Nome ?? 'Produto não encontrado',
-            `R$ ${valor.toFixed(2)}`,
-            qtde,
+            `R$ ${product?.Prod_Valor?.toFixed(2) ?? '0.00'}`,
+            product?.Prod_Qtde ?? 0,
             `R$ ${valorTotal.toFixed(2)}`
         ];
     });
@@ -63,42 +61,35 @@ export const generateReport = (client: ClientDTO, contracts: ContractDTO[], prod
         head: [tableColumn],
         body: tableRows,
         startY: y,
-        theme: 'striped', // <-- 2. MUDADO PARA 'striped' PARA TER LINHAS ZEBRADAS
-        styles: { fontSize: 10, halign: 'center', valign: 'middle' },
-        headStyles: { fillColor: [0, 150, 136], textColor: [255, 255, 255], fontStyle: 'bold' },
+        theme: 'striped',
+        headStyles: { fillColor: [0, 0, 139], fontStyle: 'bold' }, // Azul escuro
+        styles: { halign: 'center' },
+        columnStyles: { 1: { halign: 'left' } } // Alinha a coluna de produtos à esquerda
     });
 
-    // Pega a posição final da tabela para começar o rodapé
     const finalY = (doc as any).lastAutoTable.finalY;
 
-    // --- SEÇÃO DO RODAPÉ (Nova) ---
-    y = finalY + 20;
-
-    // 3. Adiciona a logo
-    // A variável 'logo' foi importada no topo do arquivo
-
-    // 4. Calcula o valor total geral
-    const valorTotalGeral = contracts.reduce((sum, contract) => {
+    // --- RODAPÉ COM TOTAIS E INFORMAÇÕES ADICIONAIS ---
+    const totalGeral = contracts.reduce((sum, contract) => {
         const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-        const qtde = product?.Prod_Qtde ?? 0;
-        const valor = product?.Prod_Valor ?? 0;
-        return sum + (qtde * valor);
+        return sum + ((product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0));
     }, 0);
 
-    // Adiciona os textos do rodapé
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('pt-BR');
-
+    // Total
     doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text("VALOR TOTAL:", doc.internal.pageSize.width - margin - 60  , finalY + 20);
+    doc.setFontSize(16);
+    doc.text(`R$ ${totalGeral.toFixed(2)}`, doc.internal.pageSize.width - margin, finalY + 20, { align: 'right' });
+
+    // Linha do Rodapé
+    doc.line(margin, pageHeight - 30, doc.internal.pageSize.width - margin, pageHeight - 30);
+    
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Data: ${formattedDate}`, 10, y + 5);
-    doc.setFontSize(14);
-    doc.text(`Valor Total: R$ ${valorTotalGeral.toFixed(2)}`, 100, y + 10);
-
-    doc.setFontSize(12);
-    doc.text("Tiago Cernev Neves | (43) 98488-0539", 10, y + 20);
-    doc.text("Orcose | PR | reidooleodistribuidora@gmail.com", 10, y + 30);
+    doc.text(`Responsável: Tiago Cernev Neves`, margin, pageHeight - 20);
+    doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, doc.internal.pageSize.width - margin, pageHeight - 20, { align: 'right' });
 
     // --- SALVAR O ARQUIVO ---
-    doc.save(`relatorio-${client.cli_razaoSocial.replace(/\s+/g, '-')}.pdf`);
+    doc.save(`relatorio-${client.cli_razaoSocial?.replace(/\s+/g, '-') || 'cliente'}.pdf`);
 }

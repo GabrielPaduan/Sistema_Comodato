@@ -4,6 +4,7 @@ import { CadastroCliente } from "../pages/cadastroCliente/CadastroCliente";
 import { VisualizarClientes } from "../pages/visualizarClientes/VisualizarClientes";
 import { ContratoCliente } from "../pages/contratoCliente/contratoCliente";
 import { Login } from "../pages/login/login";
+import { HistoricoContratos } from "../pages/HistoricoContratos/HistoricoContratos";
 
 export const AppRoutes = () => {
   return (
@@ -14,6 +15,7 @@ export const AppRoutes = () => {
         <Route path="/cadastro-clientes" element={<CadastroCliente />} />
         <Route path="/visualizar-clientes" element={<VisualizarClientes />} />
         <Route path="/contrato-cliente/:id" element={<ContratoCliente />} />
+        <Route path="/historico-contratos" element={<HistoricoContratos />} />
     </Routes>
  );
 }

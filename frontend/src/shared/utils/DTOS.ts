@@ -83,3 +83,14 @@ export interface LoginDTO {
     email: string;
     password: string;
 }
+
+export interface PdfStructDTO {
+    id: number;
+    PDF_Client_Id: number;
+    PDF_Status: number;
+}
+
+export interface PdfStructInsertDTO {
+    PDF_Client_Id: number;
+    PDF_Status: number;
+}

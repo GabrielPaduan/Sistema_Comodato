@@ -42,8 +42,8 @@ export const TableClients: React.FC = () => {
             <SearchField onSearchChange={setSearchTerm} />
             <TableContainer component={Paper} sx={{margin: "auto", cursor: "default", overflowY: "scroll", maxHeight: "57vh", marginTop: 3 }}>
                 <Table stickyHeader>
-                    <TableHead>
-                    <TableRow>
+                    <TableHead >
+                    <TableRow sx={{ background: '#00008B' }}>
                         <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>Cliente</TableCell>
                         <TableCell sx={{ fontSize: 20, textAlign: "center" }}>E-mail</TableCell>
                         <TableCell sx={{ fontSize: 20, textAlign: "center" }}>Endereço</TableCell>
@@ -88,9 +88,3 @@ export const TableClients: React.FC = () => {
         </Box>
     )
 }
-
-function setError(arg0: string) {
-    throw new Error("Function not implemented.");
-}
-
-

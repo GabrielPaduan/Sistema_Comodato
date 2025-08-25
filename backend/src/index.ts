@@ -4,6 +4,7 @@ import cors from 'cors';
 import clientRoutes from './routes/clientRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import contractRoutes from './routes/contractRoutes.js';
+import pdfRoutes from './routes/pdfRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/clientes', clientRoutes);
 app.use('/produtos', productRoutes);
 app.use('/contratos', contractRoutes);
+app.use('/pdfContratos', pdfRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Servidor backend rodando na porta http://localhost:${port}`);
