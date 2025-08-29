@@ -28,7 +28,7 @@ export const removeContract = async (id: number): Promise<void> => {
   await api.delete(`/contratos/${id}`);
 };
 
-export const updateContract = async (id: number, cmdt: number): Promise<ContractDTO> => {
-  const response = await api.put(`/contratos/${id}/${cmdt}`);
+export const updateContract = async (id: number, cmdt: number, qtde: number, valorTotal: number): Promise<ContractDTO> => {
+  const response = await api.put(`/contratos/${id}`, {cmdt, qtde, valorTotal });
   return response.data;
 };

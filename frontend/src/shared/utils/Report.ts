@@ -47,12 +47,12 @@ export const generateReport = (client: ClientDTO, contracts: ContractDTO[], prod
     const tableColumn = ["CMDT", "PRODUTOS", "VALOR UNITÁRIO", "QUANTIDADE", "VALOR TOTAL"];
     const tableRows = contracts.map(contract => {
         const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-        const valorTotal = (product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0);
+        const valorTotal = (contract?.Cont_Qtde ?? 0) * (product?.Prod_Valor ?? 0);
         return [
             contract.Cont_Comodato,
             product?.Prod_Nome ?? 'Produto não encontrado',
             `R$ ${product?.Prod_Valor?.toFixed(2) ?? '0.00'}`,
-            product?.Prod_Qtde ?? 0,
+            contract?.Cont_Qtde ?? 0,
             `R$ ${valorTotal.toFixed(2)}`
         ];
     });
@@ -72,7 +72,7 @@ export const generateReport = (client: ClientDTO, contracts: ContractDTO[], prod
     // --- RODAPÉ COM TOTAIS E INFORMAÇÕES ADICIONAIS ---
     const totalGeral = contracts.reduce((sum, contract) => {
         const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-        return sum + ((product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0));
+        return sum + ((contract?.Cont_Qtde ?? 0) * (product?.Prod_Valor ?? 0));
     }, 0);
 
     // Total

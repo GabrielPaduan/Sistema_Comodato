@@ -10,7 +10,6 @@ export class HistoricoContratos extends React.Component {
             <DefaultHeader />
             <Typography variant="h4" paddingTop={"10px"}>Histórico de Contratos</Typography>
             <TableHistoricoContract />
-            <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
         </Box>
       </>
     );

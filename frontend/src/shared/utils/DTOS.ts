@@ -44,10 +44,9 @@ export interface ProductDTO {
     Prod_UnMedida: string;
     Prod_CodProduto: string;
     Prod_CodBarras: string;
-    Prod_ValorTotal: number;
     Prod_Nome: string;
     Prod_Estoque: number;
-    Prod_Qtde: number;
+    
 }
 
 export interface ContractDTO {
@@ -55,12 +54,16 @@ export interface ContractDTO {
     Cont_ID_Cli: number;
     Cont_ID_Prod: number;
     Cont_Comodato: number;
+    Cont_Qtde: number;
+    Cont_ValorTotal: number;
 }
 
 export interface ContractDTOInsert {
     Cont_ID_Cli: number;
     Cont_ID_Prod: number;
     Cont_Comodato: number;
+    Cont_Qtde: number;
+    Cont_ValorTotal: number;
 }
 
 export interface TableContractProps {
@@ -104,5 +107,9 @@ export interface PdfStructCompleteDTO {
     PDF_Client: ClientDTO | null;
     PDF_Contracts: ContractDTO[];
     PDF_Products: ProductDTO[];
+}
 
+export interface DadosProdutoComodatoDTO {
+    qtde: number;
+    valorTotal: number
 }

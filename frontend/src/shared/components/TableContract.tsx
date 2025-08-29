@@ -11,7 +11,7 @@ interface CustomTableContractProps extends TableContractProps {
 
 export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, products, onAddProduct, onRemoveProduct, onRemoveContract }) => {
     return (
-        <TableContainer component={"table"} sx={{ width: "50%", margin: "auto", paddingTop: 10, cursor: "default" }}>
+        <TableContainer component={"table"} sx={{ margin: "auto", paddingTop: 10, cursor: "default" }}>
             <Table>
                 <TableHead>
                     <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>CMDT</TableCell>
@@ -40,13 +40,13 @@ export const TableContract: React.FC<CustomTableContractProps> = ({ contracts, p
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_Valor.toFixed(2)}</TableCell>
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
-                                            <Button onClick={() => onRemoveProduct(product.ID_Prod)}><Icon sx={{ fontSize: 30 }}>remove_circle</Icon></Button>
-                                                <Typography sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Qtde}</Typography>
-                                            <Button onClick={() => onAddProduct(product.ID_Prod, contract.Cont_Comodato)}><Icon sx={{ fontSize: 30 }}>add_circle</Icon></Button>
+                                            <Button onClick={() => onRemoveProduct(contract.ID_Contrato)}><Icon sx={{ fontSize: 30 }}>remove_circle</Icon></Button>
+                                                <Typography sx={{ fontSize: 20, textAlign: "center" }}>{contract.Cont_Qtde}</Typography>
+                                            <Button onClick={() => onAddProduct(contract.ID_Contrato, contract.Cont_Comodato)}><Icon sx={{ fontSize: 30 }}>add_circle</Icon></Button>
                                         </Box>
                                     </TableCell>
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>{product.Prod_Estoque}</TableCell>
-                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {product.Prod_ValorTotal.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ fontSize: 20, textAlign: "center" }}>R$ {contract.Cont_ValorTotal.toFixed(2)}</TableCell>
                                     <TableCell sx={{ fontSize: 20, textAlign: "center" }}>
                                         <Button onClick={() => onRemoveContract(contract.ID_Contrato, contract.Cont_ID_Prod)}><Icon sx={{ fontSize: 40 }}>delete_forever</Icon></Button>
                                     </TableCell>

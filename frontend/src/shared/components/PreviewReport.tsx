@@ -17,44 +17,26 @@ import { Grid } from '@mui/material';
 import React, { useState } from 'react';
 import { ClientDTO, ContractDTO, ProductDTO } from "../utils/DTOS";
 import logo from '../assets/logo_empresa.jpg';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
 import { useTheme } from '@mui/material/styles';
 import { createPDFContracts } from '../services/pdfContract';
+import { updateContract } from '../services/contractService';
 
 interface RelatorioPreviewProps {
     client: ClientDTO;
     contracts: ContractDTO[];
     products: ProductDTO[];
+    // handleGeneratePdf: () => void;
 }
 
 // 3. O COMPONENTE
 export const PreviewReport: React.FC<RelatorioPreviewProps> = ({ client, contracts, products }) => {
     const theme = useTheme();
-    const [isLoading, setIsLoading] = useState(false);
-    const controller = new AbortController();
-
-    const handleGeneratePdf = async () => {
-        if (isLoading) return;
-
-        setIsLoading(true);
-        
-        try {
-            await createPDFContracts({ PDF_Client_Id: client.id, PDF_Status: 0, PDF_Generated_Date: new Date().toISOString() });
-            // generateReport(client, contracts, products);
-        } catch (err) {
-            alert("PDF já criado no sistema!");
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const valorTotalGeral = contracts.reduce((sum, contract) => {
         const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-        return sum + ((product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0));
+        return sum + ((contract.Cont_Qtde ?? 0) * (product?.Prod_Valor ?? 0));
     }, 0);
-
-    
 
     return (
         <Container maxWidth="lg" sx={{ my: 4 }}>
@@ -99,13 +81,13 @@ export const PreviewReport: React.FC<RelatorioPreviewProps> = ({ client, contrac
                         <TableBody>
                             {contracts.map(contract => {
                                 const product = products.find(p => p.ID_Prod === contract.Cont_ID_Prod);
-                                const valorTotal = (product?.Prod_Qtde ?? 0) * (product?.Prod_Valor ?? 0);
+                                const valorTotal = (contract.Cont_Qtde ?? 0) * (product?.Prod_Valor ?? 0);
                                 return (
                                     <TableRow key={contract.ID_Contrato} sx={{ '&:nth-of-type(odd)': { backgroundColor: theme.palette.action.hover } }}>
                                         <TableCell align="center">{contract.Cont_Comodato}</TableCell>
                                         <TableCell>{product?.Prod_Nome || 'Produto não encontrado'}</TableCell>
                                         <TableCell align="right">R$ {product?.Prod_Valor?.toFixed(2) || '0.00'}</TableCell>
-                                        <TableCell align="center">{product?.Prod_Qtde || 0}</TableCell>
+                                        <TableCell align="center">{contract.Cont_Qtde || 0}</TableCell>
                                         <TableCell align="right">R$ {valorTotal.toFixed(2)}</TableCell>
                                     </TableRow>
                                 );
@@ -130,17 +112,16 @@ export const PreviewReport: React.FC<RelatorioPreviewProps> = ({ client, contrac
             </Paper>
 
             {/* BOTÃO DE AÇÃO */}
-            <Box sx={{ textAlign: 'center', my: 4 }}>
+            {/* <Box sx={{ textAlign: 'center', my: 4 }}>
                 <Button
                     variant="contained"
                     size="large"
                     startIcon={<FileDownloadIcon />}
                     onClick={handleGeneratePdf}
-                    disabled={isLoading}
                 >
-                    {isLoading ? 'Gerando Relatório...' : 'Gerar Relatório em PDF'}
+                    Gerar Relatório em PDF
                 </Button>
-            </Box>
+            </Box> */}
         </Container>
     );
 };

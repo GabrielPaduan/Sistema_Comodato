@@ -1,12 +1,13 @@
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { SearchField } from "./searchField";
 import { ClientDTO, PdfStructCompleteDTO, PdfStructDTO, ProductDTO } from "../utils/DTOS";
-import { getAllPDFContracts } from "../services/pdfContract";
+import { getAllPDFContracts, updatePdf } from "../services/pdfContract";
 import { getClientById } from "../services/clientService";
 import { getContractByClientId } from "../services/contractService";
 import { getProductById } from "../services/productService";
 import { PreviewReport } from "./PreviewReport";
+import { GenericButton } from "./GenericButton";
 
 export const TableHistoricoContract: React.FC = () => {
     const [pdfsData, setPdfsData] = React.useState<PdfStructDTO[]>([]);
@@ -68,25 +69,35 @@ export const TableHistoricoContract: React.FC = () => {
         fetchPDFContracts();
     }, []);
 
-    useEffect(() => {
-        console.log("PDFs completos:", pdfsCompleteData);
-    }, [pdfsCompleteData]);
+    function handleConfirmPdf(): void {
+        if (selectedPdf) {
+            // Lógica para confirmar o PDF
+            console.log("PDF confirmado:", selectedPdf);
+            
+            selectedPdf.PDF_Status = 1; // Atualiza o status para confirmado
 
-    // useEffect(() => {
-    //     const filteredData = pdfsCompleteData.filter(pdf =>
-    //         pdf.PDF_Client?.cli_razaoSocial.toLowerCase().includes(searchTerm.toLowerCase())
-    //     );
-    //     setPdfsCompleteData(filteredData);
-    // }, [searchTerm, pdfsCompleteData]);
+            const selectedPDF: PdfStructDTO = { id: selectedPdf.id, PDF_Client_Id: selectedPdf.PDF_Client ? selectedPdf.PDF_Client.id : 0, PDF_Status: selectedPdf.PDF_Status, PDF_Generated_Date: selectedPdf.PDF_Generated_Date };
+            const fetchUpdatePdf = async () => {
+                try {
+                    await updatePdf(selectedPDF.id, selectedPDF);
+                    console.log("PDF atualizado com sucesso:", selectedPDF);
+                } catch (error) {
+                    console.error("Erro ao atualizar PDF:", error);
+                }
+            };
+            fetchUpdatePdf();
+            handleCloseReport();
+        }
+    }
 
-    // const filteredClients = clientsData.filter(client =>
-    //     client.cli_razaoSocial.toLowerCase().includes(searchTerm.toLowerCase())
-    // );
+    const filteredClients = pdfsCompleteData.filter(pdfComplete =>
+        pdfComplete.PDF_Client?.cli_razaoSocial.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3}}>
+        <Box sx={{ width: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3}}>
             {!showReport && (
-                <Box>
+                <Box sx={{ width: "100%" }}>
                     <SearchField onSearchChange={setSearchTerm} />
                     <TableContainer component={Paper} sx={{margin: "auto", cursor: "default", overflowY: "scroll", maxHeight: "57vh", marginTop: 3 }}>
                         <Table stickyHeader>
@@ -100,25 +111,24 @@ export const TableHistoricoContract: React.FC = () => {
                         </TableHead>
                         <TableBody>
                             {
-                                pdfsCompleteData.length === 0 ? (
+                                filteredClients.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={5} sx={{ textAlign: "center", fontSize: 20 }}>
                                             Nenhum pdf de contrato cadastrado
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    pdfsCompleteData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((pdf) => (
+                                    filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((pdf) => (
                                         <TableRow
                                             id={String(pdf.id)}
                                             key={pdf.id}
                                             hover
                                             style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
-                                            onClick={() => window.location.href = `/contrato-cliente/${pdf.id}`}
                                         >
                                             <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_razaoSocial}</TableCell>
                                             <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_email === "" ? "Não informado" : pdf.PDF_Client?.cli_email}</TableCell>
                                             <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_end === "" ? "Não informado" : pdf.PDF_Client?.cli_end}</TableCell>
-                                            <TableCell sx={{ fontSize: 16, textAlign: "center" }}><Button variant="contained" color="primary" onClick={() => handleShowReport(pdf)}>Visualizar</Button></TableCell>
+                                            <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{ pdf.PDF_Status == 0 ? <Button variant="contained" color="primary" onClick={() => handleShowReport(pdf)}>Visualizar</Button> : "Relatório Aprovado"}</TableCell>
                                         </TableRow>
                                     ))
                                 )
@@ -127,7 +137,7 @@ export const TableHistoricoContract: React.FC = () => {
                         </Table>
                         <TablePagination
                             component="div"
-                            count={pdfsCompleteData.length}
+                            count={filteredClients.length}
                             page={page}
                             onPageChange={handleChangePage}
                             rowsPerPage={rowsPerPage}
@@ -135,10 +145,30 @@ export const TableHistoricoContract: React.FC = () => {
                             rowsPerPageOptions={[5, 10, 15]}
                         />
                     </TableContainer>
+                    <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
                 </Box>
             )}
             {selectedPdf && selectedPdf?.PDF_Client && showReport && (
-                <PreviewReport client={selectedPdf?.PDF_Client} contracts={selectedPdf?.PDF_Contracts} products={selectedPdf?.PDF_Products} />
+                <Box>
+                    <PreviewReport client={selectedPdf?.PDF_Client} contracts={selectedPdf?.PDF_Contracts} products={selectedPdf?.PDF_Products} />
+                    <Box display={"flex"} justifyContent={"space-evenly"} sx={{ textAlign: 'center', my: 4 }}>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={handleConfirmPdf}
+                        >
+                            <Typography variant="h6">Confirmar Contrato</Typography>
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            sx={{ padding: "15px" }}
+                            onClick={() => handleCloseReport()}
+                        >
+                            <Typography variant="h6">Ocultar Relatório</Typography>
+                        </Button>
+                    </Box>
+                </Box>
             )}
         </Box>
     )

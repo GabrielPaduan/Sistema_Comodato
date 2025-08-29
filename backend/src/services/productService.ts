@@ -23,10 +23,6 @@ export const findProductById = async (id: number): Promise<ProductDTO | null> =>
 };
 
 export const findProductByContractId = async (contractId: number): Promise<ProductDTO | null> => {
-  // Busca o contrato e faz join para trazer o produto relacionado diretamente
-
-  console.log("Buscando produto por ID do contrato:", contractId);
-
   const { data, error } = await supabase
     .from('Contratos')
     .select(`
@@ -44,7 +40,6 @@ export const findProductByContractId = async (contractId: number): Promise<Produ
   }
 
   const product: ProductDTO | undefined = Array.isArray(data.Produtos) ? data.Produtos[0] : data.Produtos;
-  console.log('Produto encontrado:', product);
   // Retorna o produto diretamente, garantindo que não seja undefined.
   return product ?? null;
 };

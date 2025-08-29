@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/', getAllContracts);
 router.post('/', createContract);
 router.get('/:id', getContractByClientId);
-router.put('/:id/:cmdt', updateContract);
+router.put('/:id/', updateContract);
 router.delete('/:id', removeContract);
 
 export default router;

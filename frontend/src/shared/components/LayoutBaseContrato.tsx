@@ -1,5 +1,5 @@
 import { Box, Button, Modal, TablePagination, TextField, Typography } from "@mui/material";
-import { ClientDTO, ContractDTO, ContractDTOInsert, LayoutBaseContratoProps, ProductDTO } from "../utils/DTOS";
+import { ClientDTO, ContractDTO, ContractDTOInsert, DadosProdutoComodatoDTO, LayoutBaseContratoProps, ProductDTO } from "../utils/DTOS";
 import React, { useEffect, useState } from "react";
 import { TableContract } from "./TableContract";
 import { generateReport } from "../utils/Report";
@@ -7,17 +7,18 @@ import { getClientById } from "../services/clientService"; // Supondo que você 
 import { GenericButton } from "./GenericButton";
 import { getAllProducts, getProductByContractId, getProductById } from "../services/productService";
 import { SearchField } from "./searchField";
-import { createContract, getContractByClientId, removeContract } from "../services/contractService";
+import { createContract, getContractByClientId, removeContract, updateContract } from "../services/contractService";
 import Checkbox from "@mui/material/Checkbox";
-import { createPDFContracts } from "../services/pdfContract";
+import { createPDFContracts, getPdfByClientId, updatePdf } from "../services/pdfContract";
 import { PreviewReport } from "./PreviewReport";
+import { useNavigate } from "react-router-dom";
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  minWidth: 'auto',
+  width: 'auto',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -37,6 +38,9 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const [rowsPerPage, setRowsPerPage] = useState(3);
     const [selectedProduct, setSelectedProduct] = useState<number>(0);
     const [showReport, setShowReport] = useState<boolean>(false);
+    const navigate = useNavigate();
+    // const [dadosProdutoComodato, setDadosProdutoComodato] = useState<DadosProdutoComodatoDTO[]>([]);
+
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
@@ -77,8 +81,15 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     setProducts(productData);
                     console.log(productData)
                     const contractData = await getContractByClientId(id);
+                    
+                    Array.isArray(contractData) && contractData.forEach(contract => {
+                        contract.Cont_Qtde = 0;
+                        contract.Cont_ValorTotal = 0;
+                    });
+
                     setContracts(Array.isArray(contractData) ? contractData : [contractData]);
                     
+
                     const contractsArray = Array.isArray(contractData) ? contractData : [contractData];
                     
                     const productPromises = contractsArray.map(contract => getProductByContractId(contract.ID_Contrato));
@@ -96,14 +107,6 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         };
         fetchData();
     }, []); 
-
-    useEffect(() => {
-        console.log("Products: ", productsClient)
-    }, [productsClient]);
-
-    useEffect(() => {
-        console.log("Contracts: ", contracts);
-    }, [contracts]);
 
     useEffect(() => {
         try {
@@ -129,6 +132,29 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     }, [contractsInsert]);
 
 
+    const handleGeneratePdf = async () => {
+        try {
+            contracts.forEach((contract) => {
+                updateContract(contract.ID_Contrato, contract.Cont_Comodato, contract.Cont_Qtde, contract.Cont_ValorTotal);
+            });
+            const clientPDF = await getPdfByClientId(id);
+            if (clientPDF == null) {
+                await createPDFContracts({ PDF_Client_Id: id, PDF_Status: 0, PDF_Generated_Date: new Date().toISOString() });
+            } else {
+                await updatePdf(clientPDF.id, {id: clientPDF.id, PDF_Client_Id: clientPDF.PDF_Client_Id, PDF_Status: 0, PDF_Generated_Date: new Date().toISOString() });
+            }
+            navigate("/pagina-inicial");
+            // generateReport(client, contracts, products);
+        } catch (err) {
+            alert("PDF já criado no sistema!");
+            console.error(err);
+        }
+    };
+
+    useEffect(()=> {
+        console.log("Contratos: ", contracts)
+    }, [contracts]);
+
     const createReport = async (client: ClientDTO, contracts: ContractDTO[], productsClient: ProductDTO[]) => {
         try {
             handleShowReport();
@@ -139,27 +165,34 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         }
     }
 
-    const handleAddProduct = (productId: number, cmdt: number) => {
-        setProductsClient(currentProducts =>
-            currentProducts.map(p => {
-                if (p.ID_Prod === productId && p.Prod_Qtde < cmdt && p.Prod_Qtde < p.Prod_Estoque) {
-                    const newQuantity = p.Prod_Qtde + 1;
+    const handleAddProduct = (contractId: number, cmdt: number) => {
+        setContracts(currentContracts =>
+            currentContracts.map(c => {
+                const product = productsClient.find(p => p.ID_Prod === c.Cont_ID_Prod);
+                if (
+                    c.ID_Contrato === contractId &&
+                    c.Cont_Qtde < cmdt &&
+                    product?.Prod_Estoque !== undefined &&
+                    c.Cont_Qtde < product.Prod_Estoque
+                ) {
+                    const newQuantity = c.Cont_Qtde + 1;
                     // Retorna um NOVO objeto (imutabilidade)
-                    return { ...p, Prod_Qtde: newQuantity, Prod_ValorTotal: newQuantity * p.Prod_Valor };
+                    return { ...c, Cont_Qtde: newQuantity, Cont_ValorTotal: newQuantity * (product?.Prod_Valor || 0) };
                 }
-                return p;
+                return c;
             })
         );
     };
 
-    const handleRemoveProduct = (productId: number) => {
-        setProductsClient(currentProducts =>
-            currentProducts.map(p => {
-                if (p.ID_Prod === productId && p.Prod_Qtde > 0) {
-                    const newQuantity = p.Prod_Qtde - 1;
-                    return { ...p, Prod_Qtde: newQuantity, Prod_ValorTotal: newQuantity * p.Prod_Valor };
+    const handleRemoveProduct = (contractId: number) => {
+        setContracts(currentContracts =>
+            currentContracts.map(c => {
+                const product = productsClient.find(p => p.ID_Prod === c.Cont_ID_Prod);
+                if (c.ID_Contrato === contractId && c.Cont_Qtde > 0 && product?.Prod_Valor !== undefined) {
+                    const newQuantity = c.Cont_Qtde - 1;
+                    return { ...c, Cont_Qtde: newQuantity, Cont_ValorTotal: newQuantity * product.Prod_Valor };
                 }
-                return p;
+                return c;
             })
         );
     };
@@ -179,7 +212,9 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         const newContract: ContractDTOInsert = {
             Cont_ID_Cli: client?.id || 0,
             Cont_ID_Prod: productId,
-            Cont_Comodato: cmdt
+            Cont_Comodato: cmdt,
+            Cont_Qtde: 0,
+            Cont_ValorTotal: 0.00
         };
 
         setContractsInsert(newContract);
@@ -325,7 +360,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                         {client?.cli_razaoSocial ? `Contrato de ${client.cli_razaoSocial}` : "Carregando Contrato..."}
             </Typography>
             {!showReport && (
-                <Box>
+                <Box width={"70%"} margin={"auto"}>
                     <TableContract
                         client={client}
                         contracts={contracts}
@@ -355,15 +390,26 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
             {showReport && client && (
                 <Box>
                     <PreviewReport client={client} contracts={contracts} products={productsClient} />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ padding: "15px" }}
-                        onClick={() => client && createReport(client, contracts, productsClient)}
-                        disabled={!client}
-                    >
-                        <Typography variant="h6">Ocultar Relatório</Typography>
-                    </Button>
+
+                    <Box display={"flex"} justifyContent={"space-evenly"} sx={{ textAlign: 'center', my: 4 }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            sx={{ padding: "15px" }}
+                            onClick={() => handleShowReport()}
+                            disabled={!client}
+                        >
+                            <Typography variant="h6">Ocultar Relatório</Typography>
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            sx={{ padding: "15px" }}
+                            onClick={() => handleGeneratePdf()}
+                        >
+                            <Typography variant="h6">Enviar Relatório</Typography>
+                        </Button>
+                    </Box>
                 </Box>
             )}
         </Box>
