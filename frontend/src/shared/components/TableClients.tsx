@@ -38,41 +38,41 @@ export const TableClients: React.FC = () => {
     );
 
     return (
-        <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3}}>
+        <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3, marginBottom: 2, '@media (max-width: 600px)': { maxWidth: "90%" } }}>
             <SearchField onSearchChange={setSearchTerm} />
             <TableContainer component={Paper} sx={{margin: "auto", cursor: "default", overflowY: "scroll", maxHeight: "57vh", marginTop: 3 }}>
                 <Table stickyHeader>
                     <TableHead >
-                    <TableRow sx={{ background: '#00008B' }}>
-                        <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>Cliente</TableCell>
-                        <TableCell sx={{ fontSize: 20, textAlign: "center" }}>E-mail</TableCell>
-                        <TableCell sx={{ fontSize: 20, textAlign: "center" }}>Endereço</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {
-                        filteredClients.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} sx={{ textAlign: "center", fontSize: 20 }}>
-                                    Nenhum cliente cadastrado
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((client) => (
-                                <TableRow
-                                    id={String(client.id)}
-                                    key={client.id}
-                                    hover
-                                    style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
-                                    onClick={() => window.location.href = `/contrato-cliente/${client.id}`}
-                                >
-                                    <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{client.cli_razaoSocial}</TableCell>
-                                    <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{client.cli_email === "" ? "Não informado" : client.cli_email}</TableCell>
-                                    <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{client.cli_end === "" ? "Não informado" : client.cli_end}</TableCell>
+                        <TableRow sx={{ background: '#00008B' }}>
+                            <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>Cliente</TableCell>
+                            <TableCell sx={{ fontSize: 20, textAlign: "center", '@media (max-width: 600px)': { display: 'none' } }}>E-mail</TableCell>
+                            <TableCell sx={{ fontSize: 20, textAlign: "center", '@media (max-width: 600px)': { display: 'none' } }}>Endereço</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {
+                            filteredClients.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} sx={{ textAlign: "center", fontSize: 20 }}>
+                                        Nenhum cliente cadastrado
+                                    </TableCell>
                                 </TableRow>
-                            ))
-                        )
-                    }
+                            ) : (
+                                filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((client) => (
+                                    <TableRow
+                                        id={String(client.id)}
+                                        key={client.id}
+                                        hover
+                                        style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+                                        onClick={() => window.location.href = `/contrato-cliente/${client.id}`}
+                                    >
+                                        <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{client.cli_razaoSocial}</TableCell>
+                                        <TableCell sx={{ fontSize: 16, textAlign: "center", '@media (max-width: 600px)': { display: 'none' } }}>{client.cli_email === "" ? "Não informado" : client.cli_email}</TableCell>
+                                        <TableCell sx={{ fontSize: 16, textAlign: "center", '@media (max-width: 600px)': { display: 'none' } }}>{client.cli_end === "" ? "Não informado" : client.cli_end}</TableCell>
+                                    </TableRow>
+                                ))
+                            )
+                        }
                     </TableBody>
                 </Table>
                 <TablePagination
@@ -83,6 +83,11 @@ export const TableClients: React.FC = () => {
                     rowsPerPage={rowsPerPage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     rowsPerPageOptions={[5, 10, 15]}
+                    sx={{ '@media (max-width: 600px)': { 
+                        '& .MuiTablePagination-selectLabel': {
+                            display: 'none'
+                        }
+                    }}}
                 />
             </TableContainer>
         </Box>

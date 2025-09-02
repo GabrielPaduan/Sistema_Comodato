@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 export const GenericButton: React.FC<{ name: string, type: "button" | "submit", link: string, onClick?: () => void }> = ({ name, type, link, onClick }) => {
     return (
         <Link to={link} style={{ textDecoration: 'none' }}>
-            <Button variant="contained" color="primary" type={type} sx={{ margin: '10px auto', padding: "15px" }} onClick={onClick}>
-                <Typography variant="h6" color="text.secondary">
+            <Button variant="contained" color="primary" type={type} sx={{ margin: 'auto', padding: "15px", width: "100%" }} onClick={onClick} fullWidth>
+                <Typography variant="h6" color="text.secondary" sx={{ '@media (max-width: 600px)': { fontSize: "1rem" } }}>
                 {name}
                 </Typography>
             </Button>

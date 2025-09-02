@@ -52,12 +52,13 @@ export const Form: React.FC = () => {
             flexDirection="column"
             gap={2}
             maxWidth={"70%"}
+            sx={{ '@media (max-width: 600px)': { maxWidth: "95%", padding: "10px" } }}
             margin="auto"
             onSubmit={submitForm}
         >
-            <Box display={"flex"} justifyContent={"space-between"} gap={2}>
-                <TextField id="razaoSocial" name="razaoSocial" variant="outlined" placeholder="Digite a razão social" sx={{ width: "50%" }} />
-                <TextField id="inscricaoEstadual" name="inscricaoEstadual" variant="outlined" placeholder="Digite a inscrição estadual" sx={{ width: "50%" }} />
+            <Box display={"flex"} justifyContent={"space-between"} gap={2} sx={{ '@media (max-width: 600px)': { flexDirection: "column" } }}>
+                <TextField id="razaoSocial" name="razaoSocial" variant="outlined" placeholder="Digite a razão social" sx={{ width: "50%", '@media (max-width: 600px)': { width: "100%" } }} />
+                <TextField id="inscricaoEstadual" name="inscricaoEstadual" variant="outlined" placeholder="Digite a inscrição estadual" sx={{ width: "50%", '@media (max-width: 600px)': { width: "100%" } }} />
             </Box>
             <Box display={"flex"} alignItems={"center"}>
                 <TextField id="documentos" name="documentos" variant="outlined" placeholder="Digite o documento" sx={{ width: "80%" }} />
@@ -76,14 +77,16 @@ export const Form: React.FC = () => {
                 </Box>
             </Box>
             <Box display={"flex"} flexDirection={"column"} width={"100%"} gap={2}>
-                <Box display={"flex"} justifyContent={"space-between"}>
-                    <TextField id="endereco" name="endereco" variant="outlined" placeholder="Digite o endereço" sx={{ width: "50%" }} />
-                    <TextField id="endNum" name="endNum" variant="outlined" placeholder="Digite o número" sx={{ width: "19%" }} />
-                    <TextField id="cep" name="cep" variant="outlined" placeholder="Digite o CEP" sx={{ width: "29%" }} />
+                <Box display={"flex"} justifyContent={"space-between"} sx={{ '@media (max-width: 600px)': { flexDirection: "column", gap: 2 } }}>
+                    <TextField id="endereco" name="endereco" variant="outlined" placeholder="Digite o endereço" sx={{ width: "50%", '@media (max-width: 600px)': { width: "100%" } }} />
+                    <Box width="49%" display={"flex"} justifyContent={"space-between"} gap={2} sx={{ '@media (max-width: 600px)': { width: "100%" } }}>
+                        <TextField id="endNum" name="endNum" variant="outlined" placeholder="Digite o número" sx={{ width: "35%" }} />
+                        <TextField id="cep" name="cep" variant="outlined" placeholder="Digite o CEP" sx={{ width: "64%" }} />
+                    </Box>
                 </Box>
                 <Box display={"flex"} justifyContent={"space-between"}>
                     <TextField id="cidade" name="cidade" variant="outlined" placeholder="Digite a cidade" sx={{ width: "50%" }} />
-                    <TextField id="uf" name="uf" variant="outlined" placeholder="Digite a UF" sx={{ width: "19%" }} />
+                    <TextField id="uf" name="uf" variant="outlined" placeholder="UF" sx={{ width: "19%", '@media (max-width: 600px)': { width: "15%" } }} />
                     <TextField id="bairro" name="bairro" variant="outlined" placeholder="Digite o bairro" sx={{ width: "29%" }} />
                 </Box>
             </Box>
@@ -92,24 +95,23 @@ export const Form: React.FC = () => {
 
             <Box display={"flex"} flexDirection={"column"} gap={2}>
                 <Box display={"flex"} justifyContent={"space-between"}>
-                    <TextField id="dddTel" name="dddTel" variant="outlined" placeholder="DDD" sx={{ width: "9%" }} />
-                    <TextField id="tel" name="tel" variant="outlined" placeholder="Digite o telefone" sx={{ width: "90%" }} />
+                    <TextField id="dddTel" name="dddTel" variant="outlined" placeholder="DDD" sx={{ width: "9%", '@media (max-width: 600px)': { width: "15%" } }} />
+                    <TextField id="tel" name="tel" variant="outlined" placeholder="Digite o telefone" sx={{ width: "90%", '@media (max-width: 600px)': { width: "83%" } }} />
                 </Box>
                 <Box display={"flex"} justifyContent={"space-between"}>
-                    <TextField id="dddCel" name="dddCel" variant="outlined" placeholder="DDD" sx={{ width: "9%" }} />
-                    <TextField id="cel" name="cel" variant="outlined" placeholder="Digite o celular" sx={{ width: "90%" }} />
+                        <TextField id="dddCel" name="dddCel" variant="outlined" placeholder="DDD" sx={{ width: "9%", '@media (max-width: 600px)': { width: "15%" } }} />
+                        <TextField id="cel" name="cel" variant="outlined" placeholder="Digite o celular" sx={{ width: "90%", '@media (max-width: 600px)': { width: "83%" } }} />
+                    </Box>
                 </Box>
-            </Box>
-
-            <Box display={"flex"} justifyContent={"center"} gap={2}>
-                <Box>
-                    <Button variant="contained" color="primary" type="submit" sx={{ margin: "10px auto", padding: "15px" }}>
-                        <Typography variant="h6" color="text.secondary">
-                            Cadastrar
-                        </Typography>
-                    </Button>
+            <Box display={"flex"} justifyContent={"center"} gap={2} sx={{ '@media (max-width: 600px)': { flexDirection: "column", alignItems: "center" } }}>
+                <Button variant="contained" color="primary" type="submit" sx={{ margin: "10px auto", padding: "15px", '@media (max-width: 600px)': { width: "100%" } }}>
+                    <Typography variant="h6" color="text.secondary">
+                        Cadastrar
+                    </Typography>
+                </Button>
+                <Box width={"100%"} sx={{ '@media (max-width: 600px)': { width: "100%" } }}>
+                    <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
                 </Box>
-                <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
             </Box>
         </Box>
     );

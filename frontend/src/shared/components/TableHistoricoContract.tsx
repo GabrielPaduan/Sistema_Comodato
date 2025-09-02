@@ -8,6 +8,7 @@ import { getContractByClientId } from "../services/contractService";
 import { getProductById } from "../services/productService";
 import { PreviewReport } from "./PreviewReport";
 import { GenericButton } from "./GenericButton";
+import { generateReport } from "../utils/Report";
 
 export const TableHistoricoContract: React.FC = () => {
     const [pdfsData, setPdfsData] = React.useState<PdfStructDTO[]>([]);
@@ -70,12 +71,8 @@ export const TableHistoricoContract: React.FC = () => {
     }, []);
 
     function handleConfirmPdf(): void {
-        if (selectedPdf) {
-            // Lógica para confirmar o PDF
-            console.log("PDF confirmado:", selectedPdf);
-            
+        if (selectedPdf) {           
             selectedPdf.PDF_Status = 1; // Atualiza o status para confirmado
-
             const selectedPDF: PdfStructDTO = { id: selectedPdf.id, PDF_Client_Id: selectedPdf.PDF_Client ? selectedPdf.PDF_Client.id : 0, PDF_Status: selectedPdf.PDF_Status, PDF_Generated_Date: selectedPdf.PDF_Generated_Date };
             const fetchUpdatePdf = async () => {
                 try {
@@ -86,6 +83,12 @@ export const TableHistoricoContract: React.FC = () => {
                 }
             };
             fetchUpdatePdf();
+            
+            const selectedCompletePDF = pdfsCompleteData.find(pdf => pdf.id === selectedPdf.id);
+            if (selectedCompletePDF && selectedCompletePDF.PDF_Client) {
+                generateReport(selectedCompletePDF.PDF_Client, selectedCompletePDF.PDF_Contracts, selectedCompletePDF.PDF_Products);
+            }
+
             handleCloseReport();
         }
     }
@@ -95,17 +98,17 @@ export const TableHistoricoContract: React.FC = () => {
     );
 
     return (
-        <Box sx={{ width: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3}}>
+        <Box sx={{ width: "70%", display: "flex", flexDirection: "column", alignItems: "center", margin: "auto", marginTop: 3, '@media (max-width:800px)': { width: '95%' } }}>
             {!showReport && (
                 <Box sx={{ width: "100%" }}>
                     <SearchField onSearchChange={setSearchTerm} />
-                    <TableContainer component={Paper} sx={{margin: "auto", cursor: "default", overflowY: "scroll", maxHeight: "57vh", marginTop: 3 }}>
+                    <TableContainer component={Paper} sx={{margin: "auto", cursor: "default", overflowY: "scroll", maxHeight: "57vh", marginTop: 3, marginBottom: 3 }}>
                         <Table stickyHeader>
                             <TableHead>
                             <TableRow>
                                 <TableCell  sx={{ fontSize: 20, textAlign: "center" }}>Nome</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>Data</TableCell>
-                                <TableCell sx={{ fontSize: 20, textAlign: "center" }}>Status</TableCell>
+                                <TableCell sx={{ fontSize: 20, textAlign: "center", '@media (max-width:600px)': { display: 'none' } }}>Data</TableCell>
+                                <TableCell sx={{ fontSize: 20, textAlign: "center", '@media (max-width:600px)': { display: 'none' } }}>Status</TableCell>
                                 <TableCell sx={{ fontSize: 20, textAlign: "center" }}>Ações</TableCell>
                             </TableRow>
                         </TableHead>
@@ -126,8 +129,8 @@ export const TableHistoricoContract: React.FC = () => {
                                             style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
                                         >
                                             <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_razaoSocial}</TableCell>
-                                            <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_email === "" ? "Não informado" : pdf.PDF_Client?.cli_email}</TableCell>
-                                            <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{pdf.PDF_Client?.cli_end === "" ? "Não informado" : pdf.PDF_Client?.cli_end}</TableCell>
+                                            <TableCell sx={{ fontSize: 16, textAlign: "center", '@media (max-width:600px)': { display: 'none' } }}>{pdf.PDF_Client?.cli_email === "" ? "Não informado" : pdf.PDF_Client?.cli_email}</TableCell>
+                                            <TableCell sx={{ fontSize: 16, textAlign: "center", '@media (max-width:600px)': { display: 'none' } }}>{pdf.PDF_Client?.cli_end === "" ? "Não informado" : pdf.PDF_Client?.cli_end}</TableCell>
                                             <TableCell sx={{ fontSize: 16, textAlign: "center" }}>{ pdf.PDF_Status == 0 ? <Button variant="contained" color="primary" onClick={() => handleShowReport(pdf)}>Visualizar</Button> : "Relatório Aprovado"}</TableCell>
                                         </TableRow>
                                     ))
@@ -151,13 +154,13 @@ export const TableHistoricoContract: React.FC = () => {
             {selectedPdf && selectedPdf?.PDF_Client && showReport && (
                 <Box>
                     <PreviewReport client={selectedPdf?.PDF_Client} contracts={selectedPdf?.PDF_Contracts} products={selectedPdf?.PDF_Products} />
-                    <Box display={"flex"} justifyContent={"space-evenly"} sx={{ textAlign: 'center', my: 4 }}>
+                    <Box display={"flex"} justifyContent={"space-evenly"} sx={{ textAlign: 'center', my: 4, '@media (max-width: 600px)': { flexDirection: "column", gap: 2 } }}>
                         <Button
                             variant="contained"
                             size="large"
                             onClick={handleConfirmPdf}
                         >
-                            <Typography variant="h6">Confirmar Contrato</Typography>
+                            <Typography variant="h6">Gerar Contrato</Typography>
                         </Button>
                         <Button
                             variant="contained"

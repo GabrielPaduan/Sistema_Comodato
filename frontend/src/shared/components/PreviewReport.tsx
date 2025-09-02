@@ -39,9 +39,9 @@ export const PreviewReport: React.FC<RelatorioPreviewProps> = ({ client, contrac
     }, 0);
 
     return (
-        <Container maxWidth="lg" sx={{ my: 4 }}>
-            <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
-                <Grid container justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+        <Container maxWidth="lg" sx={{ my: 4, p: { xs: 0 } }}>
+            <Paper elevation={3} sx={{ p: { xs: 1, md: 4 } }}>
+                <Grid container justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2, p: {xs: 0} }}>
                     <Grid sx={{ xs: 12, md: 6 }}>
                         <Typography variant="subtitle2" color="text.secondary">CLIENTE</Typography>
                         <Typography variant="h6" component="h1" gutterBottom>
@@ -62,7 +62,7 @@ export const PreviewReport: React.FC<RelatorioPreviewProps> = ({ client, contrac
                 <Divider sx={{ my: 4 }} />
 
                 {/* TÍTULO */}
-                <Typography variant="h4" component="h2" align="center" gutterBottom>
+                <Typography variant="h4" component="h2" align="center" gutterBottom sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }}>
                     INFORMAÇÕES DO CONTRATO
                 </Typography>
 

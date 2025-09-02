@@ -8,7 +8,7 @@ export class HistoricoContratos extends React.Component {
       <>
         <Box textAlign={"center"}>
             <DefaultHeader />
-            <Typography variant="h4" paddingTop={"10px"}>Histórico de Contratos</Typography>
+            <Typography variant="h4" paddingTop={10}>Histórico de Contratos</Typography>
             <TableHistoricoContract />
         </Box>
       </>
