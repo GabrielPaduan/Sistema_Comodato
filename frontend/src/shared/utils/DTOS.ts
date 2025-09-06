@@ -75,16 +75,19 @@ export interface LayoutBaseContratoProps {
     id: number;
 }
 
-export interface UserDTO {
-    usu_id: number;
+export interface UserInsertDTO {
     usu_nome: string;
-    usu_email: string;
+    usu_senha: string;
     usu_typeUser: number;
 }
 
 export interface LoginDTO {
-    email: string;
-    password: string;
+    nome: string;
+    senha: string;
+}
+
+export interface LoginResponse {
+  token: string;
 }
 
 export interface PdfStructDTO {

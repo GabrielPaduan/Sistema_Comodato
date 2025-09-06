@@ -69,3 +69,20 @@ export interface PdfStructInsertDTO {
     PDF_Status: number;
     PDF_Generated_Date: string;
 }
+
+export interface UserDTO {
+    usu_id: number;
+    usu_nome: string;
+    usu_typeUser: number;
+}
+
+export interface UserInsertDTO {
+    usu_nome: string;
+    usu_senha: string;
+    usu_typeUser: number;
+}
+
+export interface LoginDTO {
+    nome: string;
+    senha: string;
+}

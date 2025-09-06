@@ -103,13 +103,15 @@ export const Form: React.FC = () => {
                         <TextField id="cel" name="cel" variant="outlined" placeholder="Digite o celular" sx={{ width: "90%", '@media (max-width: 600px)': { width: "83%" } }} />
                     </Box>
                 </Box>
-            <Box display={"flex"} justifyContent={"center"} gap={2} sx={{ '@media (max-width: 600px)': { flexDirection: "column", alignItems: "center" } }}>
-                <Button variant="contained" color="primary" type="submit" sx={{ margin: "10px auto", padding: "15px", '@media (max-width: 600px)': { width: "100%" } }}>
-                    <Typography variant="h6" color="text.secondary">
-                        Cadastrar
-                    </Typography>
-                </Button>
-                <Box width={"100%"} sx={{ '@media (max-width: 600px)': { width: "100%" } }}>
+            <Box display={"flex"} justifyContent={"center"} alignItems={"center"} gap={2}>
+                <Box>
+                    <Button variant="contained" color="primary" type="submit" sx={{ margin: "10px auto", padding: "15px", '@media (max-width: 600px)': { width: "100%" } }}>
+                        <Typography variant="h6" color="text.secondary" sx={{ '@media (max-width: 600px)': { fontSize: "1rem" } }}>
+                            Cadastrar
+                        </Typography>
+                    </Button>
+                </Box>
+                <Box>
                     <GenericButton name="Voltar" type="button" link="/pagina-inicial" />
                 </Box>
             </Box>

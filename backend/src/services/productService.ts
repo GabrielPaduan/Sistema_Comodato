@@ -43,3 +43,27 @@ export const findProductByContractId = async (contractId: number): Promise<Produ
   // Retorna o produto diretamente, garantindo que não seja undefined.
   return product ?? null;
 };
+
+export const searchProductsByName = async (nameQuery: string): Promise<any[]> => {
+    if (!nameQuery) {
+        return []; // Retorna vazio se a busca for vazia
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('Produtos')
+            .select('*')
+            .ilike('Prod_CodProduto', `%${nameQuery}%`)
+            .limit(50); 
+
+        if (error) {
+            console.error("Erro ao buscar produtos:", error);
+            throw new Error(`Erro ao buscar produtos: ${error.message}`);
+        }
+
+        return data || [];
+    } catch (error) {
+        console.error("Exceção na busca de produtos:", error);
+        throw error;
+    }
+};

@@ -9,3 +9,4 @@ export { FormField } from "./FormField";
 export { LoginForm } from "./LoginForm";
 export { TableHistoricoContract } from "./TableHistoricoContract"
 export { PreviewReport } from "./PreviewReport"
+export { FormCadastroUser } from "./FormCadastroUser";

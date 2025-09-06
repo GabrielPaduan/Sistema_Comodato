@@ -46,3 +46,19 @@ export const getProductByContractId = async (req: express.Request, res: express.
         res.status(500).json({ error: error.message });
     }
 };
+
+export const searchProducts = async (req: express.Request, res: express.Response) => {
+    // O termo da busca virá como um query parameter (ex: /search?q=texto)
+    const query = req.query.q as string;
+
+    if (!query) {
+        return res.status(400).json({ message: 'O termo de busca (q) é obrigatório.' });
+    }
+
+    try {
+        const products = await productService.searchProductsByName(query);
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ error: "Erro interno no servidor ao buscar produtos." });
+    }
+};

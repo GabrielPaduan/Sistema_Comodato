@@ -21,3 +21,10 @@ export const createProduct = async (productData: Omit<ProductDTO, 'id'>): Promis
   const response = await api.post('/produtos', productData);
   return response.data;
 };
+
+export const searchProductsByName = async (nameQuery: string): Promise<ProductDTO[]> => {
+  const response = await api.get('/produtos/search-name', {
+    params: { q: nameQuery } // Passa o termo de busca como query parameter
+  });
+  return response.data;
+}

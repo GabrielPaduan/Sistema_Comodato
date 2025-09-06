@@ -5,13 +5,14 @@ import { TableContract } from "./TableContract";
 import { generateReport } from "../utils/Report";
 import { getClientById } from "../services/clientService"; // Supondo que você tenha este serviço
 import { GenericButton } from "./GenericButton";
-import { getAllProducts, getProductByContractId, getProductById } from "../services/productService";
+import { getAllProducts, getProductByContractId, getProductById, searchProductsByName } from "../services/productService";
 import { SearchField } from "./searchField";
 import { createContract, getContractByClientId, removeContract, updateContract } from "../services/contractService";
 import Checkbox from "@mui/material/Checkbox";
 import { createPDFContracts, getPdfByClientId, updatePdf } from "../services/pdfContract";
 import { PreviewReport } from "./PreviewReport";
 import { useNavigate } from "react-router-dom";
+import { useDebounce } from 'use-debounce';
 
 const style = {
   position: 'absolute',
@@ -39,7 +40,8 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     const [selectedProduct, setSelectedProduct] = useState<number>(0);
     const [showReport, setShowReport] = useState<boolean>(false);
     const navigate = useNavigate();
-    // const [dadosProdutoComodato, setDadosProdutoComodato] = useState<DadosProdutoComodatoDTO[]>([]);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+    const [loading, setLoading] = useState(false);
 
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -115,6 +117,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                 setContracts(Array.isArray(contractData) ? contractData : [contractData]);
                 if (contractsInsert && contractsInsert.Cont_ID_Prod !== undefined) {
                 const productData = await getProductById(contractsInsert.Cont_ID_Prod);
+                console.log("Produto inserido: ", productData)
                 if (productData != null) {
                     if (productsClient.map(p => p.ID_Prod).includes(productData.ID_Prod)) {
                         setProductsClient(prevProducts => prevProducts.map(p => p.ID_Prod === productData.ID_Prod ? productData : p));
@@ -154,16 +157,6 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
     useEffect(()=> {
         console.log("Contratos: ", contracts)
     }, [contracts]);
-
-    const createReport = async (client: ClientDTO, contracts: ContractDTO[], productsClient: ProductDTO[]) => {
-        try {
-            handleShowReport();
-            await createPDFContracts({ PDF_Client_Id: client.id, PDF_Status: 0, PDF_Generated_Date: new Date().toISOString() });
-            // generateReport(client, contracts, productsClient);
-        } catch (error) {
-            console.error("Erro ao criar PDF:", error);
-        }
-    }
 
     const handleAddProduct = (contractId: number, cmdt: number) => {
         setContracts(currentContracts =>
@@ -238,9 +231,29 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
         handleClose();
     };
 
-    const filteredProduct = products.filter(product =>
-        product.Prod_CodProduto.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+
+    const handleSearch = async (query: string) => {
+        if (query.length == 0) { // Não busca se o termo for muito curto
+            getAllProducts().then(allProducts => setProducts(allProducts));
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Chama nosso novo endpoint no backend
+            const response = await searchProductsByName(query);
+            setProducts(response);
+        } catch (error) {
+            console.error("Erro ao buscar produtos:", error);
+            setProducts([]); // Limpa os resultados em caso de erro
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        handleSearch(debouncedSearchTerm);
+    }, [debouncedSearchTerm]);
 
     return (
         <Box padding={10} sx={{ "@media (max-width: 600px)": { padding: 2, margin: "auto" } }}>
@@ -259,7 +272,7 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                     {/* <TextField variant="filled"  label="Código do Produto" name="codigoProduto" required placeholder="Digite o código do produto" fullWidth sx={{ marginBottom: 2 }}/> */}
                     <SearchField onSearchChange={setSearchTerm} />
                     <Box sx={{ maxHeight: "20vh", overflowY: "scroll", marginTop: 2 }}>
-                        {filteredProduct.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
+                        {products.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
                             <Box key={product.ID_Prod} sx={{ display: 'flex', justifyContent: 'space-between', padding: 1, borderBottom: '1px solid #ccc', cursor: 'pointer' }} onClick={() => setSelectedProduct(product.ID_Prod)}>
                                 <Checkbox
                                     checked={product.ID_Prod === selectedProduct}
@@ -267,13 +280,13 @@ export const LayoutBaseContrato: React.FC<LayoutBaseContratoProps> = ({ id }) =>
                                     sx={{ width: '9%', color: 'grey' }}
                                     color="secondary"
                                 />
-                                <Typography width={"90%"}>{product.Prod_Nome} || R${product.Prod_Valor}</Typography>
+                                <Typography width={"90%"}>{product.Prod_CodProduto} || R${product.Prod_Valor}</Typography>
                             </Box>
                         ))}
                     </Box>
                     <TablePagination
                         component="div"
-                        count={filteredProduct.length}
+                        count={products.length}
                         page={page}
                         onPageChange={handleChangePage}
                         rowsPerPage={rowsPerPage}
